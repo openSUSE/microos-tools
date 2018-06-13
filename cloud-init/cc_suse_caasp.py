@@ -49,8 +49,7 @@ def handle(name, cfg, cloud, log, args):
 
     if system_role == 'admin':
         log.debug(("role administration node found"))
-        cmd = ['/usr/share/caasp-container-manifests/activate.sh']
-        util.subp(cmd, capture=True)
+        enable_service('admin-node-init')
         enable_service('admin-node-setup')
         enable_service('docker')
         enable_service('container-feeder')
