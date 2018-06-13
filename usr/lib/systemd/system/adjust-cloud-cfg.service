@@ -1,0 +1,16 @@
+[Unit]
+Description=Adjust cloud.cfg for network configuration
+DefaultDependencies=no
+Wants=local-fs.target
+After=local-fs.target
+Before=cloud-init-local.service
+ConditionPathExists=/etc/cloud/cloud.cfg.d
+ConditionPathExists=!/etc/cloud/cloud.cfg.d/01-network.cfg
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/adjust-cloud-cfg
+
+[Install]
+WantedBy=multi-user.target

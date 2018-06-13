@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# go through the list of network devices. If we have for one a
+# configuration file, tell cloud-init to not configure the network.
+
+CFG=/etc/cloud/cloud.cfg.d/01-network.cfg
+
+test -f ${CFG} && exit 0
+
+for dev in `/sbin/ip -o link show | awk -F': ' '{print $2}'` ; do
+  if [ "${dev}" != "lo" ]; then
+    if [ -f /etc/sysconfig/network/ifcfg-${dev} ]; then
+      echo "network: {config: disabled}" > ${CFG}
+      exit 0
+    fi
+  fi
+done
+# if we end here, there was no network configuration, so cloud-init
+# will do the job.
+touch ${CFG}
+exit 0
