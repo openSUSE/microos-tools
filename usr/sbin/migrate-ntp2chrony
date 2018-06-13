@@ -1,0 +1,28 @@
+#!/bin/bash
+
+BACKUPDIR=/var/lib/ntp2chrony/backup
+
+# if this directory exist, we did already migrate
+test -d ${BACKUPDIR} && exit 0
+
+# if ntp is not installed, exit
+rpm -q --quiet ntp || exit 0
+
+# if chrony is not installed, exit
+rpm -q --quiet chrony || exit 0
+
+# ntpd is not enabled, exit
+systemctl is-enabled -q ntpd || exit 0
+
+# ntpd is enabled, chrony installed. Backup
+# configuration, convert configuration, disable
+# ntpd, enable chrony, but do not restart.
+mkdir -p ${BACKUPDIR} || exit 1
+cp -a /etc/ntp.* ${BACKUPDIR}/
+cp -a /etc/chrony.* ${BACKUPDIR}/
+echo "Migrate /etc/ntp.conf to /etc/chrony.conf"
+echo "Ignored lines:"
+/usr/sbin/ntp2chrony --backup --ignored-lines || exit 1
+systemctl disable ntpd
+systemctl enable chronyd
+
