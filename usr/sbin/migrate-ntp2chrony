@@ -1,7 +1,7 @@
 #!/bin/bash
 
 BACKUPDIR=/var/lib/ntp2chrony/backup
-LOGFILE=/var/lib/ntp2chrony/migrate-ntp2chrony.log
+LOGFILE=/var/log/migrate-ntp2chrony.log
 
 # if this directory exist, we did already migrate
 test -d ${BACKUPDIR} && exit 0
@@ -21,7 +21,7 @@ systemctl is-enabled -q ntpd || exit 0
 mkdir -p ${BACKUPDIR} || exit 1
 cp -a /etc/ntp.* ${BACKUPDIR}/
 cp -a /etc/chrony.* ${BACKUPDIR}/
-echo "Migrate /etc/ntp.conf to /etc/chrony.conf" | tee ${LOGFILE}
+echo "Migrate /etc/ntp.conf to /etc/chrony.conf (`date \"+%Y-%m-%d %H:%M:%S\"`)" | tee -a ${LOGFILE}
 echo "Ignored lines:" | tee -a ${LOGFILE}
 /usr/sbin/ntp2chrony --backup --ignored-lines |& tee -a ${LOGFILE}
 if [ ${PIPESTATUS[0]} -ne 0 ]; then
