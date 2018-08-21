@@ -69,8 +69,8 @@ def handle(name, cfg, cloud, log, args):
         cmd = ['sed', '-i', '-e', sed_arg, '/etc/systemd/timesyncd.conf']
         util.subp(cmd, capture=True)
 
+        enable_service('systemd-timesyncd')
         enable_service('docker')
         enable_service('salt-minion')
-        enable_service('systemd-timesyncd')
     else:
         log.warn(("Unknown role %s, skipping module named %s"), role, name)
