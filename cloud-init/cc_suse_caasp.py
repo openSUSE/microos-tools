@@ -1,6 +1,6 @@
 # vi: ts=4 expandtab
 #
-#    Copyright (C) 2017 SUSE LLC
+#    Copyright (C) 2017,2018 SUSE LLC
 #
 #    Author: Thorsten Kukuk <kukuk@suse.com>
 #
@@ -52,7 +52,6 @@ def handle(name, cfg, cloud, log, args):
         enable_service('admin-node-init')
         enable_service('admin-node-setup')
         enable_service('docker')
-        enable_service('container-feeder')
         enable_service('etcd')
         enable_service('kubelet')
         enable_service('salt-minion')
@@ -71,7 +70,6 @@ def handle(name, cfg, cloud, log, args):
         util.subp(cmd, capture=True)
 
         enable_service('docker')
-        enable_service('container-feeder')
         enable_service('salt-minion')
         enable_service('systemd-timesyncd')
     else:
