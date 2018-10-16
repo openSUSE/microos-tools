@@ -1,5 +1,5 @@
 [Unit]
-Description=SLE MicroOS Firstboot Service
+Description=openSUSE MicroOS Firstboot Service
 DefaultDependencies=no
 Conflicts=shutdown.target
 After=systemd-remount-fs.service
