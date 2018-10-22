@@ -10,13 +10,13 @@ test -f ${CFG} || exit 0
 
 DefaultEnvironment=""
 
-    while read line ; do
-        case "$line" in
+while read line ; do
+    case "$line" in
         \#*|"") continue ;;
-        esac
-        eval val=${line#*=}
-	test -z "$val" && continue
-        case "$line" in
+    esac
+    eval val=${line#*=}
+    test -z "$val" && continue
+    case "$line" in
         PROXY_ENABLED=*)
 	    test "$val" = "yes" && continue
 	    if [ -f $SYSTEMD_CFG ]; then
@@ -46,24 +46,24 @@ DefaultEnvironment=""
         NO_PROXY=*)
 	    DefaultEnvironent="$DefaultEnvironent \"NO_PROXY=${val}\" \"no_proxy=${val}\""
             ;;
-	esac
-    done < $CFG
+    esac
+done < $CFG
 
-    test -z "$DefaultEnvironent" && exit 0
+test -z "$DefaultEnvironent" && exit 0
 
-    if [ ! -d /etc/systemd/system.conf.d ]; then
-	mkdir -p /etc/systemd/system.conf.d || exit 1
-    fi
+if [ ! -d /etc/systemd/system.conf.d ]; then
+    mkdir -p /etc/systemd/system.conf.d || exit 1
+fi
 
-    TMPCFGFILE=`mktemp ${SYSTEMD_CFG}.XXXXXXXXXX` || exit 1
-    echo -e "[Manager]\nDefaultEnvironment=${DefaultEnvironent}" > ${TMPCFGFILE}
-    cmp -s ${TMPCFGFILE} ${SYSTEMD_CFG}
-    if [ $? -ne 0 ]; then
-	chmod 0644 ${TMPCFGFILE}
-	mv ${TMPCFGFILE} ${SYSTEMD_CFG}
-	systemctl daemon-reload
-    else
-	rm -f $TMPCFGFIlE
-    fi
+TMPCFGFILE=`mktemp ${SYSTEMD_CFG}.XXXXXXXXXX` || exit 1
+echo -e "[Manager]\nDefaultEnvironment=${DefaultEnvironent}" > ${TMPCFGFILE}
+cmp -s ${TMPCFGFILE} ${SYSTEMD_CFG}
+if [ $? -ne 0 ]; then
+    chmod 0644 ${TMPCFGFILE}
+    mv ${TMPCFGFILE} ${SYSTEMD_CFG}
+    systemctl daemon-reload
+else
+    rm -f $TMPCFGFIlE
+fi
 
 exit 0
