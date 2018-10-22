@@ -1,0 +1,11 @@
+[Unit]
+Description=Watch for changes in proxy configuration
+After=local-fs.target
+
+[Path]
+Unit=setup-systemd-proxy-env.service
+PathChanged=/etc/sysconfig/proxy
+
+[Install]
+WantedBy=default.target
+

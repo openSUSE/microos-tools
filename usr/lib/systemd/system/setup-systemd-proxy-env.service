@@ -1,0 +1,11 @@
+[Unit]
+Description=Update system wide proxy setup for systemd services
+Wants=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/setup-systemd-proxy-env
+
+[Install]
+WantedBy=default.target
+

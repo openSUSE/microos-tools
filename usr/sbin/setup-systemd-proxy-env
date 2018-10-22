@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# Look at /etc/sysconfig/proxy and make the proxy configuration
+# available as environment variable in systemd services
+
+CFG=/etc/sysconfig/proxy
+SYSTEMD_CFG=/etc/systemd/system.conf.d/proxy.conf
+
+test -f ${CFG} || exit 0
+
+DefaultEnvironment=""
+
+    while read line ; do
+        case "$line" in
+        \#*|"") continue ;;
+        esac
+        eval val=${line#*=}
+	test -z "$val" && continue
+        case "$line" in
+        PROXY_ENABLED=*)
+	    test "$val" = "yes" && continue
+	    if [ -f $SYSTEMD_CFG ]; then
+		rm $SYSTEMD_CFG
+		systemctl daemon-reload
+	    fi
+	    exit 0
+	    ;;
+        HTTP_PROXY=*)
+            DefaultEnvironent="$DefaultEnvironent \"HTTP_PROXY=${val}\" \"http_proxy=${val}\""
+            ;;
+        HTTPS_PROXY=*)
+	    DefaultEnvironent="$DefaultEnvironent \"HTTPS_PROXY=${val}\" \"https_proxy=${val}\""
+            ;;
+        FTP_PROXY=*)
+	    DefaultEnvironent="$DefaultEnvironent \"FTP_PROXY=${val}\" \"ftp_proxy=${val}\""
+            ;;
+        GOPHER_PROXY=*)
+	    DefaultEnvironent="$DefaultEnvironent \"GOPHER_PROXY=${val}\" \"gopher_proxy=${val}\""
+            ;;
+        SOCKS_PROXY=*)
+	    DefaultEnvironent="$DefaultEnvironent \"SOCKS_PROXY=${val}\" \"socks_proxy=${val}\""
+            ;;
+        SOCKS5_SERVER=*)
+	    DefaultEnvironent="$DefaultEnvironent \"SOCKS5_PROXY=${val}\" \"socks5_proxy=${val}\""
+            ;;
+        NO_PROXY=*)
+	    DefaultEnvironent="$DefaultEnvironent \"NO_PROXY=${val}\" \"no_proxy=${val}\""
+            ;;
+	esac
+    done < $CFG
+
+    test -z "$DefaultEnvironent" && exit 0
+
+    if [ ! -d /etc/systemd/system.conf.d ]; then
+	mkdir -p /etc/systemd/system.conf.d || exit 1
+    fi
+
+    TMPCFGFILE=`mktemp ${SYSTEMD_CFG}.XXXXXXXXXX` || exit 1
+    echo -e "[Manager]\nDefaultEnvironment=${DefaultEnvironent}" > ${TMPCFGFILE}
+    cmp -s ${TMPCFGFILE} ${SYSTEMD_CFG}
+    if [ $? -ne 0 ]; then
+	chmod 0644 ${TMPCFGFILE}
+	mv ${TMPCFGFILE} ${SYSTEMD_CFG}
+	systemctl daemon-reload
+    else
+	rm -f $TMPCFGFIlE
+    fi
+
+exit 0
