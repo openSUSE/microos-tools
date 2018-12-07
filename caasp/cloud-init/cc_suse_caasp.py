@@ -65,11 +65,6 @@ def handle(name, cfg, cloud, log, args):
 
         contents = "master: %s" % (admin_node)
         util.write_file('/etc/salt/minion.d/master.conf', contents, mode=DEFAULT_PERMS)
-        sed_arg = "s|#NTP=.*|NTP=%s|g" % (admin_node)
-        cmd = ['sed', '-i', '-e', sed_arg, '/etc/systemd/timesyncd.conf']
-        util.subp(cmd, capture=True)
-
-        enable_service('systemd-timesyncd')
         enable_service('docker')
         enable_service('salt-minion')
     else:
