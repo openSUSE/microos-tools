@@ -1,0 +1,11 @@
+[Unit]
+Description=Print systemd environment
+Wants=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/printenv
+
+[Install]
+WantedBy=default.target
+
