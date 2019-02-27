@@ -27,6 +27,8 @@ Source0:        microos-tools-%{version}.tar.xz
 Source1:        create_autoyast_profile.pl
 BuildRequires:  distribution-release
 Requires:       read-only-root-fs
+# for create_autoyast_prfile.pl
+Requires:       perl-JSON
 Conflicts:      systemd-coredump
 Obsoletes:      caasp-tools
 BuildArch:      noarch
