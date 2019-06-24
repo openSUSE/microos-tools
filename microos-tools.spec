@@ -17,7 +17,7 @@
 
 
 Name:           microos-tools
-Version:        1.0+git20190218.9e72dd7
+Version:        1.0+git20190611.6211f74
 Release:        0
 Summary:        Files and Scripts for openSUSE MicroOS
 License:        GPL-2.0-or-later
@@ -66,7 +66,7 @@ pod2man %{SOURCE1} > %{buildroot}%{_mandir}/man8/create_autoyast_profile.8
 %dir %{_sysconfdir}/systemd
 %dir %{_sysconfdir}/systemd/system
 %{_unitdir}
-%{_prefix}/lib/sysctl.d/51-corefiles.conf
+%{_prefix}/lib/sysctl.d/30-corefiles.conf
 %{_libexecdir}/MicroOS-firstboot
 %{_sbindir}/btrfsQuota
 %{_sbindir}/create_autoyast_profile
