@@ -11,7 +11,7 @@ ConditionFirstBoot=yes
 Environment=SYSTEMCTL_OPTIONS=--ignore-dependencies TERM=linux
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/lib/MicroOS-firstboot
+ExecStart=@libexecdir@/MicroOS-firstboot
 StandardOutput=tty
 StandardInput=tty
 StandardError=tty
