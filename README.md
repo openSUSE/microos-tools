@@ -12,3 +12,15 @@ Mounting of tmpfs on /tmp can be disabled by issuing
 A `/tmp` entry in `/etc/fstab` also take preference over the tmpfs
 mount unit. So updated systems will continue to use the tmp subvolume
 until this entry get's removed from `/etc/fstab`.
+
+## systemd services
+
+### setup-systemd-proxy-env.service
+
+The `setup-systemd-proxy-env.service` makes the proxy variables from
+`/etc/sysconfig/proxy` available to all systemd units.
+
+### printenv.service
+
+The `printenv.service` is to debug which environment variables exist
+by default. It just calls `printenv`.
