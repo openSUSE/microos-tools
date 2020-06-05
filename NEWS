@@ -1,2 +1,5 @@
+Version 2.1
+ - Use tmpfs for /tmp
+
 Version 2.0
  - change to autotools
