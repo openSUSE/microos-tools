@@ -1,0 +1,10 @@
+[Unit]
+Description=/tmp as tmpfs
+Before=local-fs.target
+After=swap.target
+
+[Mount]
+What=tmpfs
+Where=/tmp
+Type=tmpfs
+Options=mode=1777,nosuid,nodev
