@@ -22,4 +22,4 @@ AC_PROG_LN_S
 
 AC_OUTPUT([Makefile firstboot/Makefile firstboot/MicroOS-firstboot.service \
 	systemd-proxy-env/Makefile systemd-printenv/Makefile \
-	systemd-tmpfs/Makefile sysctl/Makefile])
+	sysctl/Makefile])
