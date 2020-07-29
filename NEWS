@@ -1,3 +1,6 @@
+Version 2.2
+ - tmp.mount is provided now by systemd
+
 Version 2.1
  - Use tmpfs for /tmp
 
