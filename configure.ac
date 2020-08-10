@@ -10,7 +10,9 @@ PKG_CHECK_VAR([systemdsystemunitdir], [systemd], [systemdsystemunitdir], [],
 	[AC_MSG_ERROR([Could not determine value for 'systemdsystemunitdir' - is the 'systemd.pc' file installed?])])
 PKG_CHECK_VAR([tmpfilesdir], [systemd], [tmpfilesdir], [],
         [AC_MSG_ERROR([Could not determine value for 'tmpfilesdir' - is the 'systemd.pc' file installed?])])
-PKG_CHECK_VAR([DRACUTDIR], [dracut], [dracutmodulesdir], [],
+PKG_CHECK_VAR([systemdgeneratordir], [systemd], [systemdsystemgeneratordir], [],
+        [AC_MSG_ERROR([Could not determine value for 'systemdsystemgeneratordir' - is the 'systemd.pc' file installed?])])
+PKG_CHECK_VAR([dracutmodulesdir], [dracut], [dracutmodulesdir], [],
         [AC_MSG_ERROR([Could not determine value for 'dracutmodulesdir' - is the 'dracut.pc' file installed?])])
 
 if test "${exec_prefix}" = "NONE"
@@ -26,4 +28,4 @@ AC_PROG_LN_S
 
 AC_OUTPUT([Makefile firstboot/Makefile firstboot/MicroOS-firstboot.service \
 	systemd-proxy-env/Makefile systemd-printenv/Makefile \
-	systemd-tmpfs/Makefile sysctl/Makefile dracut/Makefile])
+	systemd-tmpfs/Makefile sysctl/Makefile selinux/Makefile])

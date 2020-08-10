@@ -2,12 +2,6 @@
 
 rd_microos_relabel()
 {
-    # Don't do anything if .autorelabel is not set
-    if [ ! -e "$NEWROOT"/.autorelabel ] && \
-	   [ ! -e "$NEWROOT"/etc/selinux/.autorelabel ]; then
-	return 0;
-    fi
-
     # If SELinux is disabled exit now
     getarg "selinux=0" > /dev/null && return 0
 
@@ -62,4 +56,10 @@ rd_microos_relabel()
     fi
 }
 
-rd_microos_relabel
+if test -f "$NEWROOT"/etc/selinux/.autorelabel; then
+    rd_microos_relabel 
+elif getarg "autorelabel" > /dev/null; then
+    rd_microos_relabel
+fi
+
+return 0

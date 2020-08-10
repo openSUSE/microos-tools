@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# This systemd.generator(7) detects if SELinux is running and if the
+# user requested an autorelabel. If so, services will be enabled to
+# run after subvolumes and partitions are mounted before local-fs.target
+# is reached.
+
+# If invoked with no arguments (for testing) write to /tmp.
+generatordir="/tmp"
+if [ -n "$1" ]; then
+    generatordir="$1"
+fi
+
+enable_units() {
+    mkdir -p "${generatordir}"/local-fs.target.requires
+
+    for realdir in ".snapshots" "home" "opt" "root" "srv" "usr/local"; do
+	mountunit=$(systemd-escape --path ${realdir})
+	unitfile="${mountunit}-relabel.service"
+
+	echo -e "[Unit]\nDescription=Relabel ${realdir}\nDefaultDependencies=no\nAfter=${mountunit}.mount\nBefore=local-fs.target\nConditionSecurity=selinux\n\n[Service]\nType=oneshot\nExecStart=/sbin/restorecon -R -v /${realdir}" > "${generatordir}"/"${unitfile}"
+
+	ln -sf ../"${unitfile}" "${generatordir}"/local-fs.target.requires/"${unitfile}"
+    done
+}
+
+if [ -x /usr/sbin/selinuxenabled ] && selinuxenabled; then
+    if test -f /etc/selinux/.autorelabel; then
+        enable_units
+        rm -f /etc/selinux/.autorelabel
+    elif grep -sqE "\bautorelabel\b" /proc/cmdline; then
+        enable_units
+    fi
+fi
