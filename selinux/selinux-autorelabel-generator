@@ -14,11 +14,26 @@ fi
 enable_units() {
     mkdir -p "${generatordir}"/local-fs.target.requires
 
-    for realdir in ".snapshots" "home" "opt" "root" "srv" "usr/local"; do
+    for realdir in ".snapshots" "home" "opt" "root" "srv" "usr/local" \
+		"boot/grub2/i386-pc" "boot/grub2/x86_64-efi" \
+		"boot/grub2/arm64-efi" "boot/writable"; do
+        # Make sure the directory exist, else we create
+        # services for non existing mount points
+        test -d "/${realdir}" || continue
 	mountunit=$(systemd-escape --path ${realdir})
 	unitfile="${mountunit}-relabel.service"
 
-	echo -e "[Unit]\nDescription=Relabel ${realdir}\nDefaultDependencies=no\nAfter=${mountunit}.mount\nBefore=local-fs.target\nConditionSecurity=selinux\n\n[Service]\nType=oneshot\nExecStart=/sbin/restorecon -R -v /${realdir}" > "${generatordir}"/"${unitfile}"
+	{
+	    echo "[Unit]";
+            echo "Description=Relabel ${realdir}";
+            echo "DefaultDependencies=no";
+            echo "After=${mountunit}.mount";
+            echo "Before=local-fs.target";
+            echo "ConditionSecurity=selinux";
+            echo "";
+            echo "[Service]";
+            echo "Type=oneshot";
+            echo "ExecStart=/sbin/restorecon -R /${realdir}"; } > "${generatordir}"/"${unitfile}"
 
 	ln -sf ../"${unitfile}" "${generatordir}"/local-fs.target.requires/"${unitfile}"
     done
