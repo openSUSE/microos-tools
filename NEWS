@@ -1,8 +1,10 @@
 Version 2.3
  - override tmp.mount option to set correct SELinux label for /tmp
- - Use "noexec" for tmp.mount
+ - Prepare "noexec" for tmp.mount
  - Override TMPDIR for salt to not exec things in /tmp
  - Add selinux dracut module to relabel system at bootup
+ - Add locale-check to reset locale to system default if the one
+   set by SSH does not exist [bsc#1156175]
 
 Version 2.2
  - tmp.mount is provided now by systemd
