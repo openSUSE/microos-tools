@@ -27,3 +27,4 @@ test-suite.log
 check-output.*
 firstboot/MicroOS-firstboot.service
 microos-tools-*.tar.*
+locale-check/locale-check
