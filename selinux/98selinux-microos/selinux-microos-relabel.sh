@@ -39,7 +39,7 @@ rd_microos_relabel()
             if [ $ret -eq 0 ]; then
 		#LANG=C /usr/sbin/setenforce 0
 		mount -o remount,rw "$NEWROOT"
-		LANG=C chroot "$NEWROOT" /sbin/restorecon -R -e /var/lib/overlay /
+		LANG=C chroot "$NEWROOT" /sbin/restorecon -R -e /var/lib/overlay -e /sys/fs/cgroup -e /dev -e /dev/sh -e /run /
 		rm -f "$NEWROOT"/.autorelabel
 		rm -f "$NEWROOT"/etc/sysconfig/.autorelabel
 		mount -o remount,ro "$NEWROOT"
