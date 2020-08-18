@@ -1,3 +1,7 @@
+Version 2.4
+ - Don't override tmp.mount options but use tmpfiles.d/tmp.conf to
+   set the labels [bsc#1175379]
+
 Version 2.3
  - override tmp.mount option to set correct SELinux label for /tmp
  - Prepare "noexec" for tmp.mount
