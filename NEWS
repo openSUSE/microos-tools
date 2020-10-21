@@ -1,3 +1,6 @@
+Version 2.6
+ - Don't delete autorelabel file in initrd
+
 Version 2.5
  - Remove tmpfiles.d/tmp.conf, now handled by filesystem package
 
