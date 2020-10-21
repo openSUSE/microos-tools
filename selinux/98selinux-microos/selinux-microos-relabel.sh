@@ -15,7 +15,7 @@ rd_microos_relabel()
     # We need to load a SELinux policy to label the filesystem
     if [ -x "$NEWROOT/usr/sbin/load_policy" ]; then
         ret=0
-        info "Loading SELinux policy"
+        info "SELinux: relabeling root filesystem"
 
 	for sysdir in /proc /sys /dev; do
 	    if ! mount --rbind "${sysdir}" "${NEWROOT}${sysdir}" ; then
@@ -26,22 +26,16 @@ rd_microos_relabel()
 	if [ $ret -eq 0 ]; then
             # load_policy does mount /proc and /sys/fs/selinux in
             # libselinux,selinux_init_load_policy()
-            if [ -x "$NEWROOT/sbin/load_policy" ]; then
-		out=$(LANG=C chroot "$NEWROOT" /sbin/load_policy -i 2>&1)
-		ret=$?
-		info "$out"
-            else
-		out=$(LANG=C chroot "$NEWROOT" /usr/sbin/load_policy -i 2>&1)
-		ret=$?
-		info "$out"
-            fi
+            info "SELinux: loading policy"
+	    out=$(LANG=C chroot "$NEWROOT" /usr/sbin/load_policy -i 2>&1)
+	    ret=$?
+	    info "$out"
 
             if [ $ret -eq 0 ]; then
 		#LANG=C /usr/sbin/setenforce 0
+                info "SELinux: mount root read-write and relabel"
 		mount -o remount,rw "$NEWROOT"
 		LANG=C chroot "$NEWROOT" /sbin/restorecon -R -e /var/lib/overlay -e /sys -e /dev -e /run /
-		rm -f "$NEWROOT"/.autorelabel
-		rm -f "$NEWROOT"/etc/sysconfig/.autorelabel
 		mount -o remount,ro "$NEWROOT"
             fi
 	fi
