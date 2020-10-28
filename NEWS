@@ -1,3 +1,7 @@
+Version 2.7
+ - Add workaround if /.autorelabel is used, don't ignore it.
+ - Use content of .autorelabel as additional restorecon argument
+
 Version 2.6
  - Don't delete autorelabel file in initrd
 
