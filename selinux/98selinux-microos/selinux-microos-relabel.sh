@@ -2,8 +2,8 @@
 
 rd_microos_relabel()
 {
-    # If SELinux is disabled exit now
-    getarg "selinux=0" > /dev/null && return 0
+    # If SELinux is not enabled exit now
+    getarg "selinux=1" > /dev/null || return 0
 
     SELINUX="enforcing"
     [ -e "$NEWROOT/etc/selinux/config" ] && . "$NEWROOT/etc/selinux/config"
@@ -35,7 +35,8 @@ rd_microos_relabel()
 		#LANG=C /usr/sbin/setenforce 0
                 info "SELinux: mount root read-write and relabel"
 		mount -o remount,rw "$NEWROOT"
-		LANG=C chroot "$NEWROOT" /sbin/restorecon -R -e /var/lib/overlay -e /sys -e /dev -e /run /
+                FORCE=$(cat "$NEWROOT"/etc/selinux/.autorelabel)
+		LANG=C chroot "$NEWROOT" /sbin/restorecon $FORCE -R -e /var/lib/overlay -e /sys -e /dev -e /run /
 		mount -o remount,ro "$NEWROOT"
             fi
 	fi
@@ -46,12 +47,17 @@ rd_microos_relabel()
 	    fi
 	done
 
+	# Marker when we had relabelled the filesystem
+	> "$NEWROOT"/etc/selinux/.relabelled
+
 	return $ret
     fi
 }
 
+test -e "$NEWROOT"/.autorelabel -a "$NEWROOT"/.autorelabel -nt "$NEWROOT"/etc/selinux/.relabelled && (cp -a "$NEWROOT"/.autorelabel "$NEWROOT"/etc/selinux/.autorelabel; rm -f "$NEWROOT"/.autorelabel 2>/dev/null || true )
+
 if test -f "$NEWROOT"/etc/selinux/.autorelabel; then
-    rd_microos_relabel 
+    rd_microos_relabel
 elif getarg "autorelabel" > /dev/null; then
     rd_microos_relabel
 fi
