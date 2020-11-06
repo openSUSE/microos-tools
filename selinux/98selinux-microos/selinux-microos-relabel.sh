@@ -22,6 +22,8 @@ rd_microos_relabel()
 		warn "ERROR: mounting ${sysdir} failed!"
 		ret=1
 	    fi
+            # Don't let recursive umounts propagate into the bind source
+            mount --make-rslave "${NEWROOT}${sysdir}"
 	done
 	if [ $ret -eq 0 ]; then
             # load_policy does mount /proc and /sys/fs/selinux in
