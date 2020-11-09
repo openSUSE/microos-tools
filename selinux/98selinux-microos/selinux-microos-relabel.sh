@@ -22,6 +22,8 @@ rd_microos_relabel()
 		warn "ERROR: mounting ${sysdir} failed!"
 		ret=1
 	    fi
+            # Don't let recursive umounts propagate into the bind source
+            mount --make-rslave "${NEWROOT}${sysdir}"
 	done
 	if [ $ret -eq 0 ]; then
             # load_policy does mount /proc and /sys/fs/selinux in
@@ -35,7 +37,8 @@ rd_microos_relabel()
 		#LANG=C /usr/sbin/setenforce 0
                 info "SELinux: mount root read-write and relabel"
 		mount -o remount,rw "$NEWROOT"
-                FORCE=$(cat "$NEWROOT"/etc/selinux/.autorelabel)
+                FORCE=
+                [ -e "$NEWROOT"/etc/selinux/.autorelabel ] && FORCE="$(cat "$NEWROOT"/etc/selinux/.autorelabel)"
 		LANG=C chroot "$NEWROOT" /sbin/restorecon $FORCE -R -e /var/lib/overlay -e /sys -e /dev -e /run /
 		mount -o remount,ro "$NEWROOT"
             fi
