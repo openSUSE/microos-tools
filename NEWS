@@ -1,3 +1,7 @@
+Version 2.8
+- Don't propagate umounts into the real root
+- Use content of .autorelabel only if it exists
+
 Version 2.7
  - Add workaround if /.autorelabel is used, don't ignore it.
  - Use content of .autorelabel as additional restorecon argument
