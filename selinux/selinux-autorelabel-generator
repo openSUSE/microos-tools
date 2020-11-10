@@ -39,7 +39,7 @@ enable_units() {
     done
 }
 
-if [ -x /usr/sbin/selinuxenabled ] && selinuxenabled; then
+if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
     if test -f /etc/selinux/.autorelabel; then
         enable_units
         rm -f /etc/selinux/.autorelabel
