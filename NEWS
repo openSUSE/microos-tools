@@ -1,3 +1,6 @@
+Version 2.9
+- Use absolute path for selinuxenabled in systemd generator
+
 Version 2.8
 - Don't propagate umounts into the real root
 - Use content of .autorelabel only if it exists
