@@ -34,3 +34,9 @@ The `setup-systemd-proxy-env.service` makes the proxy variables from
 The `printenv.service` is to debug which environment variables exist
 by default. It just calls `printenv`.
 
+## development tools
+
+* microos-rw: switches the root file system to read-write
+* microos-ro: resets btrfs property to read-only again.
+* rpmorphan: display files not owned by rpm
+* rpm-sortbysize: list all installed packages sorted by size

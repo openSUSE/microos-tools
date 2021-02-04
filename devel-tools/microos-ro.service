@@ -1,0 +1,11 @@
+[Unit]
+Description=Switch root FS to read-only again
+Before=systemd-reboot.service
+DefaultDependencies=no
+
+[Service]
+ExecStart=/usr/sbin/microos-ro
+Type=oneshot
+
+[Install]
+WantedBy=reboot.target shutdown.target
