@@ -27,7 +27,7 @@ enable_units() {
 	    echo "[Unit]";
             echo "Description=Relabel ${realdir}";
             echo "DefaultDependencies=no";
-            echo "After=${mountunit}.mount";
+            echo "RequiresMountsFor=/${realdir}";
             echo "Before=local-fs.target";
             echo "ConditionSecurity=selinux";
             echo "";
