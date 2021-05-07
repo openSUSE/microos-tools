@@ -1,17 +1,21 @@
 #!/bin/sh
 
-rd_microos_relabel()
+rd_is_selinux_enabled()
 {
     # If SELinux is not enabled exit now
-    getarg "selinux=1" > /dev/null || return 0
+    getarg "selinux=1" > /dev/null || return 1
 
     SELINUX="enforcing"
     [ -e "$NEWROOT/etc/selinux/config" ] && . "$NEWROOT/etc/selinux/config"
 
     if [ "$SELINUX" = "disabled" ]; then
-        return 0;
+        return 1;
     fi
+    return 0
+}
 
+rd_microos_relabel()
+{
     # We need to load a SELinux policy to label the filesystem
     if [ -x "$NEWROOT/usr/sbin/load_policy" ]; then
         ret=0
@@ -57,12 +61,23 @@ rd_microos_relabel()
     fi
 }
 
-test -e "$NEWROOT"/.autorelabel -a "$NEWROOT"/.autorelabel -nt "$NEWROOT"/etc/selinux/.relabelled && (cp -a "$NEWROOT"/.autorelabel "$NEWROOT"/etc/selinux/.autorelabel; rm -f "$NEWROOT"/.autorelabel 2>/dev/null || true )
+if test -e "$NEWROOT"/.autorelabel -a "$NEWROOT"/.autorelabel -nt "$NEWROOT"/etc/selinux/.relabelled ; then
+    cp -a "$NEWROOT"/.autorelabel "$NEWROOT"/etc/selinux/.autorelabel
+    rm -f "$NEWROOT"/.autorelabel 2>/dev/null
+fi
 
-if test -f "$NEWROOT"/etc/selinux/.autorelabel; then
-    rd_microos_relabel
-elif getarg "autorelabel" > /dev/null; then
-    rd_microos_relabel
+if rd_is_selinux_enabled; then
+    if test -f "$NEWROOT"/etc/selinux/.autorelabel; then
+	rd_microos_relabel
+    elif getarg "autorelabel" > /dev/null; then
+	rd_microos_relabel
+    fi
+elif test -e "$NEWROOT"/etc/selinux/.relabelled; then
+    # SELinux is off but looks like some labeling took place before.
+    # So probably a boot with manually disabled SELinux. Make sure
+    # the system gets relabelled next time SELinux is on.
+    > "$NEWROOT"/etc/selinux/.autorelabel
+    warn "SElinux is off in lablelled system!"
 fi
 
 return 0
