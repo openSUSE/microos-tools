@@ -1,3 +1,7 @@
+Version 2.10
+- Fixes and improvements for SELinux support
+- Add devel tools
+
 Version 2.9
 - Use absolute path for selinuxenabled in systemd generator
 
