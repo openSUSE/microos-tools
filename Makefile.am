@@ -1,7 +1,7 @@
 AUTOMAKE_OPTIONS = 1.6 foreign check-news dist-xz
 
 SUBDIRS = firstboot systemd-proxy-env systemd-printenv systemd-tmpfs \
-	selinux sysctl locale-check
+	selinux sysctl locale-check devel-tools
 
 CLEANFILES = *~
 

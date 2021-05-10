@@ -1,0 +1,2 @@
+#!/usr/bin/sh
+rpm -qa --qf '%{SIZE} %{NAME}\n' | sort -n

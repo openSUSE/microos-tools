@@ -1,0 +1,6 @@
+#!/bin/bash
+btrfs prop set -t s / ro true
+# can't do that, would remount all subvolumes :-(
+#mount -o remount,ro /
+systemctl disable --runtime microos-ro.service
+systemctl unmask --runtime transactional-update.service
