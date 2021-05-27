@@ -40,11 +40,15 @@ rd_microos_relabel()
             if [ $ret -eq 0 ]; then
 		#LANG=C /usr/sbin/setenforce 0
                 info "SELinux: mount root read-write and relabel"
-		mount -o remount,rw "$NEWROOT"
+		# Use alternate mount point to prevent overwriting subvolume options (bsc#1186563)
+		ROOT_SELINUX="${NEWROOT}-selinux"
+		mkdir -p "${ROOT_SELINUX}"
+		mount --rbind --make-rslave "${NEWROOT}" "${ROOT_SELINUX}"
+		mount -o remount,rw "${ROOT_SELINUX}"
                 FORCE=
-                [ -e "$NEWROOT"/etc/selinux/.autorelabel ] && FORCE="$(cat "$NEWROOT"/etc/selinux/.autorelabel)"
-		LANG=C chroot "$NEWROOT" /sbin/restorecon $FORCE -R -e /var/lib/overlay -e /sys -e /dev -e /run /
-		mount -o remount,ro "$NEWROOT"
+		[ -e "${ROOT_SELINUX}"/etc/selinux/.autorelabel ] && FORCE="$(cat "${ROOT_SELINUX}"/etc/selinux/.autorelabel)"
+		LANG=C chroot "${ROOT_SELINUX}" /sbin/restorecon $FORCE -R -e /var/lib/overlay -e /sys -e /dev -e /run /
+		umount -R "${ROOT_SELINUX}"
             fi
 	fi
 	for sysdir in /proc /sys /dev; do
