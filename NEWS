@@ -1,3 +1,6 @@
+Version 2.11
+- Fix unwritable /var / /etc after SELinux relabel [bsc#1186563]
+
 Version 2.10
 - Fixes and improvements for SELinux support
 - Add devel tools
