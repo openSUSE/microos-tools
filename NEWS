@@ -1,3 +1,8 @@
+Version 2.12
+- Remove locale-check, aaa_base has now an own solution
+- Remove old CaaSP stuff
+- Remove systemd firstboot overwrite
+
 Version 2.11
 - Fix unwritable /var / /etc after SELinux relabel [bsc#1186563]
 
