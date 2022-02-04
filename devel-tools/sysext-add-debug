@@ -1,0 +1,39 @@
+#!/bin/bash -e
+
+if [ "$#" = 0 -o "$1" = "--help" ]; then
+	echo "Usage: $0 PACKAGE..."
+	echo "Downloads gdb and debuginfo for specified packages to /var/lib/extensions/"
+	echo "Uses systemd-sysext(8) to temporarily overlay them into the system."
+	exit 0
+fi
+
+pkgs=('gdb')
+for i in "$@"; do
+	if [ "${i%-debuginfo}" = "$i" ] && [ "${i%-debugsource}" = "$i" ]; then
+		pkgs+=("$i-debuginfo" "$i-debugsource")
+	else
+		pkgs+=("$i")
+	fi
+done
+
+. /usr/lib/os-release
+
+ext_base=/var/lib/extensions/debug-"$VERSION_ID"
+mkdir -p "$ext_base/download"
+
+echo "getting ${pkgs[@]}"
+zypper --pkg-cache-dir="$ext_base/download" --plus-content debug in --dry-run --download-only "${pkgs[@]}"
+
+while read pkg; do
+	echo "adding ${pkg##*/}"
+	rpm2cpio "$pkg" | cpio -idD "$ext_base"
+	rm "$pkg"
+done < <(find "$ext_base/download" -type f -name '*.rpm')
+
+mkdir -p "$ext_base"/usr/lib/extension-release.d
+cat > "$ext_base"/usr/lib/extension-release.d/extension-release.debug-"$VERSION_ID" <<EOF
+ID=$ID
+VERSION_ID=$VERSION_ID
+EOF
+
+systemd-sysext merge
