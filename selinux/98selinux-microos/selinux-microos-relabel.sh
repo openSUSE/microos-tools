@@ -21,6 +21,14 @@ rd_microos_relabel()
         ret=0
         info "SELinux: relabeling root filesystem"
 
+	# If this doesn't exist because e.g. it's not mounted yet due to a bug
+	# (boo#1197309), the exclusion is ignored. If it gets mounted during
+	# the relabel, it gets wrong labels assigned.
+	if ! [ -d "$NEWROOT/var/lib/overlay" ]; then
+	    warn "ERROR: /var/lib/overlay doesn't exist - /var not mounted (yet)?"
+            return 1
+	fi
+
 	for sysdir in /proc /sys /dev; do
 	    if ! mount --rbind "${sysdir}" "${NEWROOT}${sysdir}" ; then
 		warn "ERROR: mounting ${sysdir} failed!"
