@@ -3,7 +3,7 @@
 rd_is_selinux_enabled()
 {
     # If SELinux is not enabled exit now
-    getarg "selinux=1" > /dev/null || return 1
+    grep -qw selinux /sys/kernel/security/lsm || return 1
 
     SELINUX="enforcing"
     [ -e "$NEWROOT/etc/selinux/config" ] && . "$NEWROOT/etc/selinux/config"
