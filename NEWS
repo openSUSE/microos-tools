@@ -1,3 +1,9 @@
+Version 2.13
+
+- 98selinux-microos: Don't rely on selinux=1 [bsc#1202449]
+- Add sysext-add-debug
+- Make sure /var/lib/overlay exists before relabeling
+
 Version 2.12
 - Remove locale-check, aaa_base has now an own solution
 - Remove old CaaSP stuff
