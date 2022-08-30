@@ -1,7 +1,7 @@
 systemddir = $(systemdsystemunitdir)
 
 systemd_DATA = microos-ro.service
-sbin_SCRIPTS = microos-rw microos-ro rpm-sortbysize
+sbin_SCRIPTS = microos-rw microos-ro rpm-sortbysize sysext-add-debug
 sbin_PROGRAMS = rpmorphan
 
 rpmorphan_LDADD = $(RPM_LIBS)

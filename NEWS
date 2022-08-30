@@ -1,5 +1,7 @@
-Version 2.13
+Version 2.14
+- Fix Makefile for devel-tools
 
+Version 2.13
 - 98selinux-microos: Don't rely on selinux=1 [bsc#1202449]
 - Add sysext-add-debug
 - Make sure /var/lib/overlay exists before relabeling
