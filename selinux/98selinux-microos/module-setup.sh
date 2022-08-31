@@ -14,5 +14,5 @@ depends() {
 # called by dracut
 install() {
     inst_hook pre-pivot 50 "$moddir/selinux-microos-relabel.sh"
-    inst_multiple setenforce
+    inst_multiple grep setenforce
 }
