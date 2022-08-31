@@ -1,3 +1,6 @@
+Version 2.15
+- 98selinux-microos: Add grep as dependency
+
 Version 2.14
 - Fix Makefile for devel-tools
 
