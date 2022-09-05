@@ -1,3 +1,6 @@
+Version 2.16
+- 98selinux-microos: Make the btrfs subvolume writable temporarily [boo#1202395]
+
 Version 2.15
 - 98selinux-microos: Add grep as dependency
 
