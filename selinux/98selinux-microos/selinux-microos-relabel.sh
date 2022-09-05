@@ -53,9 +53,12 @@ rd_microos_relabel()
 		mkdir -p "${ROOT_SELINUX}"
 		mount --rbind --make-rslave "${NEWROOT}" "${ROOT_SELINUX}"
 		mount -o remount,rw "${ROOT_SELINUX}"
+                oldrovalue="$(btrfs prop get "${ROOT_SELINUX}" ro | cut -d= -f2)"
+                btrfs prop set "${ROOT_SELINUX}" ro false
                 FORCE=
 		[ -e "${ROOT_SELINUX}"/etc/selinux/.autorelabel ] && FORCE="$(cat "${ROOT_SELINUX}"/etc/selinux/.autorelabel)"
 		LANG=C chroot "${ROOT_SELINUX}" /sbin/restorecon $FORCE -R -e /var/lib/overlay -e /sys -e /dev -e /run /
+                btrfs prop set "${ROOT_SELINUX}" ro "${oldrovalue}"
 		umount -R "${ROOT_SELINUX}"
             fi
 	fi
