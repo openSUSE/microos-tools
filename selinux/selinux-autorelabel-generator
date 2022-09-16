@@ -33,7 +33,15 @@ enable_units() {
             echo "";
             echo "[Service]";
             echo "Type=oneshot";
-            echo "ExecStart=/sbin/restorecon -R /${realdir}"; } > "${generatordir}"/"${unitfile}"
+	    case "$realdir" in
+		.snapshots)
+		    echo "ExecStart=/sbin/restorecon -R -x /${realdir}";
+		    ;;
+		*)
+		    echo "ExecStart=/sbin/restorecon -R /${realdir}";
+		    ;;
+	    esac
+	} > "${generatordir}"/"${unitfile}"
 
 	ln -sf ../"${unitfile}" "${generatordir}"/local-fs.target.requires/"${unitfile}"
     done
