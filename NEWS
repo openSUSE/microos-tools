@@ -1,3 +1,7 @@
+Version 2.17
+- selinux-autorelabel-generator: Don't cross partition boundaries
+  for /.snapshots when relabeling [issue#11]
+
 Version 2.16
 - 98selinux-microos: Make the btrfs subvolume writable temporarily [boo#1202395]
 
