@@ -92,7 +92,7 @@ elif test -e "$NEWROOT"/etc/selinux/.relabelled; then
     # So probably a boot with manually disabled SELinux. Make sure
     # the system gets relabelled next time SELinux is on.
     > "$NEWROOT"/etc/selinux/.autorelabel
-    warn "SElinux is off in lablelled system!"
+    warn "SElinux is off in labelled system!"
 fi
 
 return 0
