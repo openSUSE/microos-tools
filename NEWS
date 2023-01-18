@@ -1,3 +1,8 @@
+Version 2.18
+- Add TMPDIR to tukit binddirs for Salt
+- 98selinux-microos: Add chroot as dependency
+- Fix spelling error in warning
+
 Version 2.17
 - selinux-autorelabel-generator: Don't cross partition boundaries
   for /.snapshots when relabeling [issue#11]
