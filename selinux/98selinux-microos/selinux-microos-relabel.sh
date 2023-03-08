@@ -16,64 +16,55 @@ rd_is_selinux_enabled()
 
 rd_microos_relabel()
 {
-    # We need to load a SELinux policy to label the filesystem
-    if [ -x "$NEWROOT/usr/sbin/load_policy" ]; then
-        ret=0
-        info "SELinux: relabeling root filesystem"
+    info "SELinux: relabeling root filesystem"
 
-	# If this doesn't exist because e.g. it's not mounted yet due to a bug
-	# (boo#1197309), the exclusion is ignored. If it gets mounted during
-	# the relabel, it gets wrong labels assigned.
-	if ! [ -d "$NEWROOT/var/lib/overlay" ]; then
-	    warn "ERROR: /var/lib/overlay doesn't exist - /var not mounted (yet)?"
-            return 1
-	fi
-
-	for sysdir in /proc /sys /dev; do
-	    if ! mount --rbind "${sysdir}" "${NEWROOT}${sysdir}" ; then
-		warn "ERROR: mounting ${sysdir} failed!"
-		ret=1
-	    fi
-            # Don't let recursive umounts propagate into the bind source
-            mount --make-rslave "${NEWROOT}${sysdir}"
-	done
-	if [ $ret -eq 0 ]; then
-            # load_policy does mount /proc and /sys/fs/selinux in
-            # libselinux,selinux_init_load_policy()
-            info "SELinux: loading policy"
-	    out=$(LANG=C chroot "$NEWROOT" /usr/sbin/load_policy -i 2>&1)
-	    ret=$?
-	    info "$out"
-
-            if [ $ret -eq 0 ]; then
-		#LANG=C /usr/sbin/setenforce 0
-                info "SELinux: mount root read-write and relabel"
-		# Use alternate mount point to prevent overwriting subvolume options (bsc#1186563)
-		ROOT_SELINUX="${NEWROOT}-selinux"
-		mkdir -p "${ROOT_SELINUX}"
-		mount --rbind --make-rslave "${NEWROOT}" "${ROOT_SELINUX}"
-		mount -o remount,rw "${ROOT_SELINUX}"
-                oldrovalue="$(btrfs prop get "${ROOT_SELINUX}" ro | cut -d= -f2)"
-                btrfs prop set "${ROOT_SELINUX}" ro false
-                FORCE=
-		[ -e "${ROOT_SELINUX}"/etc/selinux/.autorelabel ] && FORCE="$(cat "${ROOT_SELINUX}"/etc/selinux/.autorelabel)"
-		LANG=C chroot "${ROOT_SELINUX}" /sbin/restorecon $FORCE -R -e /var/lib/overlay -e /sys -e /dev -e /run /
-                btrfs prop set "${ROOT_SELINUX}" ro "${oldrovalue}"
-		umount -R "${ROOT_SELINUX}"
-            fi
-	fi
-	for sysdir in /proc /sys /dev; do
-	    if ! umount -R "${NEWROOT}${sysdir}" ; then
-		warn "ERROR: unmounting ${sysdir} failed!"
-		ret=1
-	    fi
-	done
-
-	# Marker when we had relabelled the filesystem
-	> "$NEWROOT"/etc/selinux/.relabelled
-
-	return $ret
+    # If this doesn't exist because e.g. it's not mounted yet due to a bug
+    # (boo#1197309), the exclusion is ignored. If it gets mounted during
+    # the relabel, it gets wrong labels assigned.
+    if ! [ -d "$NEWROOT/var/lib/overlay" ]; then
+	warn "ERROR: /var/lib/overlay doesn't exist - /var not mounted (yet)?"
+	return 1
     fi
+
+    ret=0
+    for sysdir in /proc /sys /dev; do
+	if ! mount --rbind "${sysdir}" "${NEWROOT}${sysdir}" ; then
+	    warn "ERROR: mounting ${sysdir} failed!"
+	    ret=1
+	fi
+	# Don't let recursive umounts propagate into the bind source
+	mount --make-rslave "${NEWROOT}${sysdir}"
+    done
+    if [ $ret -eq 0 ]; then
+	#LANG=C /usr/sbin/setenforce 0
+	info "SELinux: mount root read-write and relabel"
+	# Use alternate mount point to prevent overwriting subvolume options (bsc#1186563)
+	ROOT_SELINUX="${NEWROOT}-selinux"
+	mkdir -p "${ROOT_SELINUX}"
+	mount --rbind --make-rslave "${NEWROOT}" "${ROOT_SELINUX}"
+	mount -o remount,rw "${ROOT_SELINUX}"
+	oldrovalue="$(btrfs prop get "${ROOT_SELINUX}" ro | cut -d= -f2)"
+	btrfs prop set "${ROOT_SELINUX}" ro false
+	FORCE=
+	[ -e "${ROOT_SELINUX}"/etc/selinux/.autorelabel ] && FORCE="$(cat "${ROOT_SELINUX}"/etc/selinux/.autorelabel)"
+	. "${ROOT_SELINUX}"/etc/selinux/config
+	LANG=C chroot "$ROOT_SELINUX" /sbin/setfiles $FORCE -e /var/lib/overlay -e /proc -e /sys -e /dev -e /etc "/etc/selinux/${SELINUXTYPE}/contexts/files/file_contexts" $(chroot "$ROOT_SELINUX" cut -d" " -f2 /proc/mounts)
+        # On overlayfs, st_dev isn't consistent so setfiles thinks it's a different mountpoint, ignoring it.
+        LANG=C chroot "$ROOT_SELINUX" find /etc -exec /sbin/setfiles $FORCE "/etc/selinux/${SELINUXTYPE}/contexts/files/file_contexts" \{\} +
+	btrfs prop set "${ROOT_SELINUX}" ro "${oldrovalue}"
+	umount -R "${ROOT_SELINUX}"
+    fi
+    for sysdir in /proc /sys /dev; do
+	if ! umount -R "${NEWROOT}${sysdir}" ; then
+	    warn "ERROR: unmounting ${sysdir} failed!"
+	    ret=1
+	fi
+    done
+
+    # Marker when we had relabelled the filesystem
+    > "$NEWROOT"/etc/selinux/.relabelled
+
+    return $ret
 }
 
 if test -e "$NEWROOT"/.autorelabel -a "$NEWROOT"/.autorelabel -nt "$NEWROOT"/etc/selinux/.relabelled ; then
