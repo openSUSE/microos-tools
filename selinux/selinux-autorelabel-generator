@@ -23,25 +23,21 @@ enable_units() {
 	mountunit=$(systemd-escape --path ${realdir})
 	unitfile="${mountunit}-relabel.service"
 
-	{
-	    echo "[Unit]";
-            echo "Description=Relabel ${realdir}";
-            echo "DefaultDependencies=no";
-            echo "RequiresMountsFor=${realdir}";
-            echo "Before=local-fs.target";
-            echo "ConditionSecurity=selinux";
-            echo "";
-            echo "[Service]";
-            echo "Type=oneshot";
-	    case "$realdir" in
-		.snapshots)
-		    echo "ExecStart=/sbin/restorecon -R -x ${realdir}";
-		    ;;
-		*)
-		    echo "ExecStart=/sbin/restorecon -R ${realdir}";
-		    ;;
-	    esac
-	} > "${generatordir}"/"${unitfile}"
+	opts=""
+	[ "${realdir}" == "/.snapshots" ] && opts="-x"
+
+	cat >"${generatordir}/${unitfile}" <<-EOF
+		[Unit]
+		Description=Relabel ${realdir}
+		DefaultDependencies=no
+		RequiresMountsFor=${realdir}
+		Before=local-fs.target
+		ConditionSecurity=selinux
+
+		[Service]
+		Type=oneshot
+		ExecStart=/sbin/restorecon -R ${opts} ${realdir}
+	EOF
 
 	ln -sf ../"${unitfile}" "${generatordir}"/local-fs.target.requires/"${unitfile}"
     done
