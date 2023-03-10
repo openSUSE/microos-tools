@@ -14,12 +14,12 @@ fi
 enable_units() {
     mkdir -p "${generatordir}"/local-fs.target.requires
 
-    for realdir in ".snapshots" "home" "opt" "root" "srv" "usr/local" \
-		"boot/grub2/i386-pc" "boot/grub2/x86_64-efi" \
-		"boot/grub2/arm64-efi" "boot/writable"; do
+    for realdir in "/.snapshots" "/home" "/opt" "/root" "/srv" "/usr/local" \
+		"/boot/grub2/i386-pc" "/boot/grub2/x86_64-efi" \
+		"/boot/grub2/arm64-efi" "/boot/writable"; do
         # Make sure the directory exist, else we create
         # services for non existing mount points
-        test -d "/${realdir}" || continue
+        test -d "${realdir}" || continue
 	mountunit=$(systemd-escape --path ${realdir})
 	unitfile="${mountunit}-relabel.service"
 
@@ -27,7 +27,7 @@ enable_units() {
 	    echo "[Unit]";
             echo "Description=Relabel ${realdir}";
             echo "DefaultDependencies=no";
-            echo "RequiresMountsFor=/${realdir}";
+            echo "RequiresMountsFor=${realdir}";
             echo "Before=local-fs.target";
             echo "ConditionSecurity=selinux";
             echo "";
@@ -35,10 +35,10 @@ enable_units() {
             echo "Type=oneshot";
 	    case "$realdir" in
 		.snapshots)
-		    echo "ExecStart=/sbin/restorecon -R -x /${realdir}";
+		    echo "ExecStart=/sbin/restorecon -R -x ${realdir}";
 		    ;;
 		*)
-		    echo "ExecStart=/sbin/restorecon -R /${realdir}";
+		    echo "ExecStart=/sbin/restorecon -R ${realdir}";
 		    ;;
 	    esac
 	} > "${generatordir}"/"${unitfile}"
