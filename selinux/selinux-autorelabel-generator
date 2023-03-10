@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 # This systemd.generator(7) detects if SELinux is running and if the
 # user requested an autorelabel. If so, services will be enabled to
