@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(microos-tools, 2.18)
+AC_INIT([microos-tools], [2.18])
 AM_INIT_AUTOMAKE
 AC_PREFIX_DEFAULT(/usr)
 
@@ -28,6 +28,7 @@ AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_LN_S
 
-AC_OUTPUT([Makefile systemd-proxy-env/Makefile systemd-printenv/Makefile \
+AC_CONFIG_FILES([Makefile systemd-proxy-env/Makefile systemd-printenv/Makefile \
 	tmpfs/Makefile sysctl/Makefile selinux/Makefile \
 	devel-tools/Makefile])
+AC_OUTPUT
