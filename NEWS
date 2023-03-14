@@ -1,3 +1,6 @@
+Version 2.19:
+- Clean up selinux-autorelabel-generator and make it compatible with systemd 253
+
 Version 2.18
 - Add TMPDIR to tukit binddirs for Salt
 - 98selinux-microos: Add chroot as dependency
