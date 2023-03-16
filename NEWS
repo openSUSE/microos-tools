@@ -1,3 +1,6 @@
+Version 2.20:
+- 98selinux-microos: Don't load the policy to label the system
+
 Version 2.19:
 - Clean up selinux-autorelabel-generator and make it compatible with systemd 253
 
