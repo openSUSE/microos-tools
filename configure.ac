@@ -29,6 +29,6 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 
 AC_CONFIG_FILES([Makefile systemd-proxy-env/Makefile systemd-printenv/Makefile \
-	tmpfs/Makefile sysctl/Makefile selinux/Makefile \
+	tmpfs/Makefile selinux/Makefile \
 	devel-tools/Makefile])
 AC_OUTPUT
