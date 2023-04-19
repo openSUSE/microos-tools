@@ -48,6 +48,8 @@ rd_microos_relabel()
 	FORCE=
 	[ -e "${ROOT_SELINUX}"/etc/selinux/.autorelabel ] && FORCE="$(cat "${ROOT_SELINUX}"/etc/selinux/.autorelabel)"
 	. "${ROOT_SELINUX}"/etc/selinux/config
+	# Marker when we had relabelled the filesystem. This is relabelled as well.
+	> "${ROOT_SELINUX}"/etc/selinux/.relabelled
 	LANG=C chroot "$ROOT_SELINUX" /sbin/setfiles $FORCE -e /var/lib/overlay -e /proc -e /sys -e /dev -e /etc "/etc/selinux/${SELINUXTYPE}/contexts/files/file_contexts" $(chroot "$ROOT_SELINUX" cut -d" " -f2 /proc/mounts)
         # On overlayfs, st_dev isn't consistent so setfiles thinks it's a different mountpoint, ignoring it.
         LANG=C chroot "$ROOT_SELINUX" find /etc -exec /sbin/setfiles $FORCE "/etc/selinux/${SELINUXTYPE}/contexts/files/file_contexts" \{\} +
@@ -60,9 +62,6 @@ rd_microos_relabel()
 	    ret=1
 	fi
     done
-
-    # Marker when we had relabelled the filesystem
-    > "$NEWROOT"/etc/selinux/.relabelled
 
     return $ret
 }
