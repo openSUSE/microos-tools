@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT([microos-tools], [2.20])
+AC_INIT([microos-tools], [2.21])
 AM_INIT_AUTOMAKE
 AC_PREFIX_DEFAULT(/usr)
 
