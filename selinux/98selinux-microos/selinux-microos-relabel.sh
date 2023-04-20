@@ -49,8 +49,10 @@ rd_microos_relabel()
 	[ -e "${ROOT_SELINUX}"/etc/selinux/.autorelabel ] && FORCE="$(cat "${ROOT_SELINUX}"/etc/selinux/.autorelabel)"
 	. "${ROOT_SELINUX}"/etc/selinux/config
 	LANG=C chroot "$ROOT_SELINUX" /sbin/setfiles $FORCE -e /var/lib/overlay -e /proc -e /sys -e /dev -e /etc "/etc/selinux/${SELINUXTYPE}/contexts/files/file_contexts" $(chroot "$ROOT_SELINUX" cut -d" " -f2 /proc/mounts)
-        # On overlayfs, st_dev isn't consistent so setfiles thinks it's a different mountpoint, ignoring it.
-        LANG=C chroot "$ROOT_SELINUX" find /etc -exec /sbin/setfiles $FORCE "/etc/selinux/${SELINUXTYPE}/contexts/files/file_contexts" \{\} +
+        # Be careful here: On overlayfs, st_dev isn't consistent so setfiles thinks it's a different mountpoint.
+        # Changing the xattr of a file can cause a copy-up of the parent directories, changing their st_dev.
+        # Be safe and just relabel every file individually.
+        LANG=C chroot "$ROOT_SELINUX" find /etc -exec /sbin/setfiles $FORCE "/etc/selinux/${SELINUXTYPE}/contexts/files/file_contexts" \{\} \;
 	btrfs prop set "${ROOT_SELINUX}" ro "${oldrovalue}"
 	umount -R "${ROOT_SELINUX}"
     fi
