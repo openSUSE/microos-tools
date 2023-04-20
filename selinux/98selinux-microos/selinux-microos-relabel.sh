@@ -52,7 +52,11 @@ rd_microos_relabel()
 	> "${ROOT_SELINUX}"/etc/selinux/.relabelled
 	LANG=C chroot "$ROOT_SELINUX" /sbin/setfiles $FORCE -e /var/lib/overlay -e /proc -e /sys -e /dev -e /etc "/etc/selinux/${SELINUXTYPE}/contexts/files/file_contexts" $(chroot "$ROOT_SELINUX" cut -d" " -f2 /proc/mounts)
         # On overlayfs, st_dev isn't consistent so setfiles thinks it's a different mountpoint, ignoring it.
-        LANG=C chroot "$ROOT_SELINUX" find /etc -exec /sbin/setfiles $FORCE "/etc/selinux/${SELINUXTYPE}/contexts/files/file_contexts" \{\} +
+        # st_dev changes also on copy-up triggered by setfiles itself, so the only way to relabel properly
+        # is to list every file explicitly.
+        # That's not all: There's a kernel bug that security.selinux of parent directories is lost on copy-up (bsc#1210690).
+        # Work around that by visiting children first and only then the parent directories.
+        LANG=C chroot "$ROOT_SELINUX" find /etc -depth -exec /sbin/setfiles $FORCE "/etc/selinux/${SELINUXTYPE}/contexts/files/file_contexts" \{\} +
 	btrfs prop set "${ROOT_SELINUX}" ro "${oldrovalue}"
 	umount -R "${ROOT_SELINUX}"
     fi
