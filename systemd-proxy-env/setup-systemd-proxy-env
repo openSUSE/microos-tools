@@ -26,44 +26,44 @@ while read line ; do
 	    exit 0
 	    ;;
         HTTP_PROXY=*)
-            DefaultEnvironent="$DefaultEnvironent \"HTTP_PROXY=${val}\" \"http_proxy=${val}\""
+            DefaultEnvironment="$DefaultEnvironment \"HTTP_PROXY=${val}\" \"http_proxy=${val}\""
             ;;
         HTTPS_PROXY=*)
-	    DefaultEnvironent="$DefaultEnvironent \"HTTPS_PROXY=${val}\" \"https_proxy=${val}\""
+	    DefaultEnvironment="$DefaultEnvironment \"HTTPS_PROXY=${val}\" \"https_proxy=${val}\""
             ;;
         FTP_PROXY=*)
-	    DefaultEnvironent="$DefaultEnvironent \"FTP_PROXY=${val}\" \"ftp_proxy=${val}\""
+	    DefaultEnvironment="$DefaultEnvironment \"FTP_PROXY=${val}\" \"ftp_proxy=${val}\""
             ;;
         GOPHER_PROXY=*)
-	    DefaultEnvironent="$DefaultEnvironent \"GOPHER_PROXY=${val}\" \"gopher_proxy=${val}\""
+	    DefaultEnvironment="$DefaultEnvironment \"GOPHER_PROXY=${val}\" \"gopher_proxy=${val}\""
             ;;
         SOCKS_PROXY=*)
-	    DefaultEnvironent="$DefaultEnvironent \"SOCKS_PROXY=${val}\" \"socks_proxy=${val}\""
+	    DefaultEnvironment="$DefaultEnvironment \"SOCKS_PROXY=${val}\" \"socks_proxy=${val}\""
             ;;
         SOCKS5_SERVER=*)
-	    DefaultEnvironent="$DefaultEnvironent \"SOCKS5_PROXY=${val}\" \"socks5_proxy=${val}\""
+	    DefaultEnvironment="$DefaultEnvironment \"SOCKS5_SERVER=${val}\" \"socks5_server=${val}\""
             ;;
         NO_PROXY=*)
-	    DefaultEnvironent="$DefaultEnvironent \"NO_PROXY=${val}\" \"no_proxy=${val}\""
+	    DefaultEnvironment="$DefaultEnvironment \"NO_PROXY=${val}\" \"no_proxy=${val}\""
             ;;
     esac
 done < $CFG
 
-test -z "$DefaultEnvironent" && exit 0
+test -z "$DefaultEnvironment" && exit 0
 
 if [ ! -d /etc/systemd/system.conf.d ]; then
     mkdir -p /etc/systemd/system.conf.d || exit 1
 fi
 
 TMPCFGFILE=`mktemp ${SYSTEMD_CFG}.XXXXXXXXXX` || exit 1
-echo -e "[Manager]\nDefaultEnvironment=${DefaultEnvironent}" > ${TMPCFGFILE}
+echo -e "[Manager]\nDefaultEnvironment=${DefaultEnvironment}" > ${TMPCFGFILE}
 cmp -s ${TMPCFGFILE} ${SYSTEMD_CFG}
 if [ $? -ne 0 ]; then
     chmod 0644 ${TMPCFGFILE}
     mv ${TMPCFGFILE} ${SYSTEMD_CFG}
     systemctl daemon-reload
 else
-    rm -f $TMPCFGFIlE
+    rm -f $TMPCFGFILE
 fi
 
 exit 0
