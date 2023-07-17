@@ -30,5 +30,5 @@ AC_PROG_LN_S
 
 AC_CONFIG_FILES([Makefile systemd-proxy-env/Makefile systemd-printenv/Makefile \
 	tmpfs/Makefile selinux/Makefile \
-	devel-tools/Makefile])
+	devel-tools/Makefile subvol-mount-generator/Makefile])
 AC_OUTPUT

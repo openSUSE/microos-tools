@@ -100,6 +100,7 @@ This package contains tools to make developing of MicroOS easier.
 %dir %{_prefix}/lib/dracut/modules.d
 %{_prefix}/lib/dracut/modules.d/98selinux-microos
 %{_systemdgeneratordir}/selinux-autorelabel-generator
+%{_systemdgeneratordir}/suse-btrfs-subvol-mount-generator
 
 %files -n microos-devel-tools
 %{_unitdir}/microos-ro.service
