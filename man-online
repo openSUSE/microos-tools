@@ -1,0 +1,55 @@
+#!/bin/bash -e
+
+section=
+
+helpandquit()
+{
+      cat <<-EOF
+	  Usage: $0 [man options] [[section] page ...] ...
+
+	  OPTIONS:
+	    -h, --help       help screen
+	EOF
+    exit 0
+}
+
+cleanup()
+{
+    [ -z "$tmpdir" ] || rm -rf "$tmpdir"
+}
+
+show()
+{
+    local topic="${1:?}"
+    if ! curl -s -f -o "$tmpdir/$topic".gz -f -L https://manpages.opensuse.org/"$topic${section:+.}$section".gz; then
+	echo "Failed to fetch $topic" >&2
+	return 0
+    fi
+    mandoc -l "$tmpdir/$topic.gz"
+}
+
+getopttmp=$(getopt -o hs: --long help -n "${0##*/}" -- "$@")
+eval set -- "$getopttmp"
+
+while true ; do
+    case "$1" in
+	-h|--help) helpandquit ;;
+	-s) section="$2"; shift 2 ;;
+	--) shift ; break ;;
+	*) echo "Internal error!" ; exit 1 ;;
+    esac
+done
+
+[ -z "$1" ] && helpandquit
+
+tmpdir=$(mktemp -d -t addimageencryption.XXXXXX)
+trap cleanup EXIT
+
+if [ -z "$section" ] && [ "${1/#[0-9]/}" != "$1" ]; then
+    section="$1"
+    shift
+fi
+
+for i in "$@"; do
+    show "$i"
+done
