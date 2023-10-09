@@ -36,7 +36,6 @@ rd_microos_relabel()
 	mount --make-rslave "${NEWROOT}${sysdir}"
     done
     if [ $ret -eq 0 ]; then
-	#LANG=C /usr/sbin/setenforce 0
 	info "SELinux: mount root read-write and relabel"
 	# Use alternate mount point to prevent overwriting subvolume options (bsc#1186563)
 	ROOT_SELINUX="${NEWROOT}-selinux"
