@@ -26,21 +26,22 @@ rd_microos_relabel()
         return 1
     fi
 
+    # Use alternate mount point to prevent overwriting subvolume options (bsc#1186563)
+    ROOT_SELINUX="${NEWROOT}-selinux"
+    mkdir -p "${ROOT_SELINUX}"
+    # Don't let mounts propagate into other namespaces
+    mount --bind --make-private "${ROOT_SELINUX}" "${ROOT_SELINUX}"
+    mount --rbind --make-rslave "${NEWROOT}" "${ROOT_SELINUX}"
     ret=0
     for sysdir in /proc /sys /dev; do
-        if ! mount --rbind "${sysdir}" "${NEWROOT}${sysdir}" ; then
+        # Don't let recursive umounts propagate into the bind source
+        if ! mount --rbind --make-rslave "${sysdir}" "${ROOT_SELINUX}${sysdir}" ; then
             warn "ERROR: mounting ${sysdir} failed!"
             ret=1
         fi
-        # Don't let recursive umounts propagate into the bind source
-        mount --make-rslave "${NEWROOT}${sysdir}"
     done
     if [ $ret -eq 0 ]; then
         info "SELinux: mount root read-write and relabel"
-        # Use alternate mount point to prevent overwriting subvolume options (bsc#1186563)
-        ROOT_SELINUX="${NEWROOT}-selinux"
-        mkdir -p "${ROOT_SELINUX}"
-        mount --rbind --make-rslave "${NEWROOT}" "${ROOT_SELINUX}"
         mount -o remount,rw "${ROOT_SELINUX}"
         oldrovalue="$(btrfs prop get "${ROOT_SELINUX}" ro | cut -d= -f2)"
         btrfs prop set "${ROOT_SELINUX}" ro false
@@ -57,14 +58,10 @@ rd_microos_relabel()
         # Work around that by visiting children first and only then the parent directories.
         LANG=C chroot "$ROOT_SELINUX" find /etc -depth -exec /sbin/setfiles $FORCE "/etc/selinux/${SELINUXTYPE}/contexts/files/file_contexts" \{\} +
         btrfs prop set "${ROOT_SELINUX}" ro "${oldrovalue}"
-        umount -R "${ROOT_SELINUX}"
     fi
-    for sysdir in /proc /sys /dev; do
-        if ! umount -R "${NEWROOT}${sysdir}" ; then
-            warn "ERROR: unmounting ${sysdir} failed!"
-            ret=1
-        fi
-    done
+
+    umount -R "${ROOT_SELINUX}"
+    umount "${ROOT_SELINUX}" # For the private bind on itself
 
     return $ret
 }
