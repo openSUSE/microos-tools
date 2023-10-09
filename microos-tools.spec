@@ -33,6 +33,8 @@ BuildRequires:  pkgconfig(dracut)
 BuildRequires:  pkgconfig(rpm)
 BuildRequires:  pkgconfig(systemd)
 Requires:       read-only-root-fs
+# for man-online
+Requires:       mandoc-bin
 
 %description
 Files, scripts and directories for openSUSE MicroOS.
@@ -100,6 +102,8 @@ This package contains tools to make developing of MicroOS easier.
 %dir %{_prefix}/lib/dracut/modules.d
 %{_prefix}/lib/dracut/modules.d/98selinux-microos
 %{_systemdgeneratordir}/selinux-autorelabel-generator
+%{_bindir}/man-online
+%{_distconfdir}/profile.d/man-online.sh
 
 %files -n microos-devel-tools
 %{_unitdir}/microos-ro.service

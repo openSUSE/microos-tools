@@ -6,3 +6,7 @@ SUBDIRS = systemd-proxy-env systemd-printenv tmpfs \
 CLEANFILES = *~
 
 EXTRA_DIST = README.md
+
+profile_DATA = man-online.sh
+profiledir = $(prefix)$(sysconfdir)/profile.d
+bin_SCRIPTS = man-online
