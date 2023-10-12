@@ -26,9 +26,6 @@ License:        GPL-2.0-or-later
 Group:          Development/Tools/Other
 URL:            https://github.com/openSUSE/microos-tools
 Source:         microos-tools-%{version}.tar.xz
-Source1:        tmp.mount
-Source2:        microos-tmp.conf
-Source99:       microos-tools-rpmlintrc
 BuildRequires:  automake
 BuildRequires:  distribution-release
 BuildRequires:  pkgconfig
@@ -56,10 +53,6 @@ This package contains tools to make developing of MicroOS easier.
 
 %install
 %make_install
-%if 0%{?suse_version} <= 1500
-install -m 0644 %{SOURCE1} %{buildroot}/%{_unitdir}/
-install -m 0644 %{SOURCE2} %{buildroot}/%{_tmpfilesdir}
-%endif
 
 %pre
 %service_add_pre setup-systemd-proxy-env.service setup-systemd-proxy-env.path printenv.service
@@ -100,9 +93,6 @@ install -m 0644 %{SOURCE2} %{buildroot}/%{_tmpfilesdir}
 %dir %{_unitdir}/salt-minion.service.d
 %{_unitdir}/salt-minion.service.d/TMPDIR.conf
 %{_tmpfilesdir}/salt-minion-tmpdir.conf
-%if %{?suse_version} <= 1500
-%dir %{_distconfdir}
-%endif
 %dir %{_distconfdir}/tukit.conf.d
 %{_distconfdir}/tukit.conf.d/salt-tukit.conf
 %{_sbindir}/setup-systemd-proxy-env
@@ -110,10 +100,6 @@ install -m 0644 %{SOURCE2} %{buildroot}/%{_tmpfilesdir}
 %dir %{_prefix}/lib/dracut/modules.d
 %{_prefix}/lib/dracut/modules.d/98selinux-microos
 %{_systemdgeneratordir}/selinux-autorelabel-generator
-%if 0%{?suse_version} <= 1500
-%{_unitdir}/tmp.mount
-%{_tmpfilesdir}/microos-tmp.conf
-%endif
 
 %files -n microos-devel-tools
 %{_unitdir}/microos-ro.service
