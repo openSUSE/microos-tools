@@ -1,0 +1,20 @@
+ci_workflow:
+  steps:
+    - branch_package:
+        source_project: devel:microos:ci:microos-tools
+        source_package: microos-tools
+        target_project: devel:microos:ci:microos-tools
+  filters:
+    event: pull_request
+
+master_workflow:
+  steps:
+    - branch_package:
+        source_project: devel:microos:ci:microos-tools
+        source_package: microos-tools
+        target_project: devel:microos:ci:microos-tools
+  filters:
+    event: push
+    branches:
+      only:
+        - master
