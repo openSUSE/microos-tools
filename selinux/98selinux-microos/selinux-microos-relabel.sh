@@ -1,4 +1,5 @@
 #!/bin/sh
+type ismounted > /dev/null 2>&1 || . /lib/dracut-lib.sh
 
 rd_is_selinux_enabled()
 {
@@ -61,7 +62,12 @@ rd_microos_relabel()
     fi
 
     umount -R "${ROOT_SELINUX}"
-    umount "${ROOT_SELINUX}" # For the private bind on itself
+    # In some versions of util-linux, ^ does not umount stacked mounts
+    # (https://github.com/util-linux/util-linux/issues/2551)
+    # so take care of the private bind on itself separately:
+    if ismounted "${ROOT_SELINUX}"; then
+        umount "${ROOT_SELINUX}"
+    fi
 
     return $ret
 }
