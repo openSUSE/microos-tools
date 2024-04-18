@@ -1,6 +1,13 @@
 #!/bin/sh
 type ismounted > /dev/null 2>&1 || . /lib/dracut-lib.sh
 
+# In this mode, the zipl initrd uses grub2-emu to kexec the real kernel
+# and initrd. Don't run there, only in the real initrd (s.a. bsc#1218065).
+if getargbool 0 'initgrub'; then
+    # This script gets sourced, so must use return here instead of exit
+    return 0
+fi
+
 rd_is_selinux_enabled()
 {
     # If SELinux is not enabled exit now
