@@ -27,8 +27,8 @@ enable_units() {
 	unitfile="${mountunit}-relabel.service"
 	relabel_unit_list="$unitfile $relabel_unit_list"
 
-	opts=""
-	[ "${realdir}" == "/.snapshots" ] && opts="-x"
+	opts="-T 0"
+	[ "${realdir}" == "/.snapshots" ] && opts="-T 0 -x"
 
 	cat >"${generatordir}/${unitfile}" <<-EOF
 		[Unit]
