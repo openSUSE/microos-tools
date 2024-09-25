@@ -57,7 +57,7 @@ rd_microos_relabel()
         # is to list every file explicitly.
         # That's not all: There's a kernel bug that security.selinux of parent directories is lost on copy-up (bsc#1210690).
         # Work around that by visiting children first and only then the parent directories.
-        LANG=C chroot "$ROOT_SELINUX" find /etc -depth -exec /sbin/setfiles $FORCE -T 0 "/etc/selinux/${SELINUXTYPE}/contexts/files/file_contexts" \{\} +
+        LANG=C chroot "$ROOT_SELINUX" find /etc -depth -exec /sbin/setfiles $FORCE "/etc/selinux/${SELINUXTYPE}/contexts/files/file_contexts" \{\} +
         btrfs prop set "${ROOT_SELINUX}" ro "${oldrovalue}"
     fi
 
