@@ -11,10 +11,13 @@ and not shared one in /tmp.
 
 ## SELinux
 
-MicroOS has preliminary support for SELinux.
+MicroOS has support for SELinux.
 If the file `/etc/selinux/.autorelabel` exists, the dracut module
 `98selinux-microos` will label the root filesystem including
-`/etc` and `/var`.
+`/etc` and `/var`. The selinux-autorelabel-generator will generate
+services to relabel other mountpoints during boot.
+
+There is a script for automated testing of this in test/test.sh.
 
 ## locale-check
 
