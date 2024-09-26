@@ -32,13 +32,22 @@ BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(dracut)
 BuildRequires:  pkgconfig(rpm)
 BuildRequires:  pkgconfig(systemd)
-Requires:       /usr/bin/findmnt
 Requires:       read-only-root-fs
+Requires:       selinux-autorelabel = %{version}
 # for man-online
 Requires:       mandoc-bin
 
 %description
 Files, scripts and directories for openSUSE MicroOS.
+
+%package -n selinux-autorelabel
+Summary:        Automatic SELinux relabelling during early boot
+Requires:       /usr/bin/findmnt
+Requires:       policycoreutils
+
+%description -n selinux-autorelabel
+This package contains a dracut module and systemd generator for relabelling
+the system during early boot.
 
 %package -n microos-devel-tools
 Summary:        Tools to develop MicroOS
@@ -87,7 +96,6 @@ This package contains tools to make developing of MicroOS easier.
 %service_del_postun microos-ro.service
 
 %files
-%license COPYING
 %dir %{_sysconfdir}/selinux
 %config %{_sysconfdir}/selinux/fixfiles_exclude_dirs
 %{_unitdir}/printenv.service
@@ -99,12 +107,15 @@ This package contains tools to make developing of MicroOS easier.
 %dir %{_distconfdir}/tukit.conf.d
 %{_distconfdir}/tukit.conf.d/salt-tukit.conf
 %{_sbindir}/setup-systemd-proxy-env
+%{_bindir}/man-online
+%{_distconfdir}/profile.d/man-online.sh
+
+%files -n selinux-autorelabel
+%license COPYING
 %dir %{_prefix}/lib/dracut
 %dir %{_prefix}/lib/dracut/modules.d
 %{_prefix}/lib/dracut/modules.d/98selinux-microos
 %{_systemdgeneratordir}/selinux-autorelabel-generator
-%{_bindir}/man-online
-%{_distconfdir}/profile.d/man-online.sh
 
 %files -n microos-devel-tools
 %{_unitdir}/microos-ro.service
