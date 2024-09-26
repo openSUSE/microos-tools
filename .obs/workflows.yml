@@ -9,10 +9,9 @@ ci_workflow:
 
 master_workflow:
   steps:
-    - branch_package:
-        source_project: devel:microos:ci:microos-tools
-        source_package: microos-tools
-        target_project: devel:microos:ci:microos-tools
+    - trigger_services:
+        project: devel:microos:ci:microos-tools
+        package: microos-tools
   filters:
     event: push
     branches:
