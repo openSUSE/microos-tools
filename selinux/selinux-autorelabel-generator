@@ -9,64 +9,64 @@ set -e
 # If invoked with no arguments (for testing) write to /tmp.
 generatordir="/tmp"
 if [ -n "$1" ]; then
-    generatordir="$1"
+	generatordir="$1"
 fi
 
 enable_units() {
-    mkdir -p "${generatordir}"/local-fs.target.requires
+	mkdir -p "${generatordir}"/local-fs.target.requires
 
-    relabel_unit_list=""
+	relabel_unit_list=""
 
-    for realdir in "/.snapshots" "/home" "/opt" "/root" "/srv" "/usr/local" \
-		"/boot/grub2/i386-pc" "/boot/grub2/x86_64-efi" \
-		"/boot/grub2/arm64-efi" "/boot/writable"; do
-        # Make sure the directory exist, else we create
-        # services for non existing mount points
-        test -d "${realdir}" || continue
-	mountunit=$(systemd-escape --path ${realdir})
-	unitfile="${mountunit}-relabel.service"
-	relabel_unit_list="$unitfile $relabel_unit_list"
+	for realdir in "/.snapshots" "/home" "/opt" "/root" "/srv" "/usr/local" \
+	    "/boot/grub2/i386-pc" "/boot/grub2/x86_64-efi" \
+	    "/boot/grub2/arm64-efi" "/boot/writable"; do
+		# Make sure the directory exist, else we create
+		# services for non existing mount points
+		test -d "${realdir}" || continue
+		mountunit=$(systemd-escape --path ${realdir})
+		unitfile="${mountunit}-relabel.service"
+		relabel_unit_list="$unitfile $relabel_unit_list"
 
-	opts="-T 0"
-	[ "${realdir}" == "/.snapshots" ] && opts="${opts} -x"
+		opts="-T 0"
+		[ "${realdir}" == "/.snapshots" ] && opts="${opts} -x"
 
+		cat >"${generatordir}/${unitfile}" <<-EOF
+			[Unit]
+			Description=Relabel ${realdir}
+			DefaultDependencies=no
+			RequiresMountsFor=${realdir}
+			Before=local-fs.target
+			ConditionSecurity=selinux
+
+			[Service]
+			Type=oneshot
+			ExecStart=/sbin/restorecon -R ${opts} ${realdir}
+		EOF
+
+		ln -sf ../"${unitfile}" "${generatordir}"/local-fs.target.requires/"${unitfile}"
+	done
+
+	unitfile="mark-autorelabel-done.service"
 	cat >"${generatordir}/${unitfile}" <<-EOF
 		[Unit]
-		Description=Relabel ${realdir}
+		Description=Mark autorelabel as done
 		DefaultDependencies=no
-		RequiresMountsFor=${realdir}
 		Before=local-fs.target
+		After=${relabel_unit_list}
+		Requires=${relabel_unit_list}
 		ConditionSecurity=selinux
+		ConditionPathExists=/etc/selinux/.autorelabel
 
 		[Service]
 		Type=oneshot
-		ExecStart=/sbin/restorecon -R ${opts} ${realdir}
-	EOF
-
-	ln -sf ../"${unitfile}" "${generatordir}"/local-fs.target.requires/"${unitfile}"
-    done
-
-    unitfile="mark-autorelabel-done.service"
-    cat >"${generatordir}/${unitfile}" <<-EOF
-	[Unit]
-	Description=Mark autorelabel as done
-	DefaultDependencies=no
-	Before=local-fs.target
-	After=${relabel_unit_list}
-	Requires=${relabel_unit_list}
-	ConditionSecurity=selinux
-	ConditionPathExists=/etc/selinux/.autorelabel
-
-	[Service]
-	Type=oneshot
-	ExecStart=/usr/bin/rm /etc/selinux/.autorelabel
+		ExecStart=/usr/bin/rm /etc/selinux/.autorelabel
 EOF
 
-   ln -sf "../${unitfile}" "${generatordir}/local-fs.target.requires/${unitfile}"
+	ln -sf "../${unitfile}" "${generatordir}/local-fs.target.requires/${unitfile}"
 }
 
 if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
-    if [ -f /etc/selinux/.autorelabel ] || grep -wq autorelabel /proc/cmdline; then
-        enable_units
-    fi
+	if [ -f /etc/selinux/.autorelabel ] || grep -wq autorelabel /proc/cmdline; then
+		enable_units
+	fi
 fi
