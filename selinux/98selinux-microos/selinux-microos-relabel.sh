@@ -26,10 +26,19 @@ rd_microos_relabel()
 {
     info "SELinux: relabeling root filesystem"
 
+    root_is_btrfs=
+    if [ "$(findmnt --noheadings --output FSTYPE --target "$NEWROOT")" = "btrfs" ]; then
+        root_is_btrfs=y
+    fi
+    etc_is_overlay=
+    if [ "$(findmnt --fstab --noheadings --output FSTYPE /etc --tab-file "${NEWROOT}/etc/fstab")" = "overlay" ]; then
+        etc_is_overlay=y
+    fi
+
     # If this doesn't exist because e.g. it's not mounted yet due to a bug
     # (boo#1197309), the exclusion is ignored. If it gets mounted during
     # the relabel, it gets wrong labels assigned.
-    if ! [ -d "$NEWROOT/var/lib/overlay" ]; then
+    if [ -n "$etc_is_overlay" ] && ! [ -d "$NEWROOT/var/lib/overlay" ]; then
         warn "ERROR: /var/lib/overlay doesn't exist - /var not mounted (yet)?"
         return 1
     fi
@@ -49,23 +58,40 @@ rd_microos_relabel()
         fi
     done
     if [ $ret -eq 0 ]; then
+        # Mount /var and /etc, need to be relabelled as well for booting.
+        for mp in /var /etc; do
+            if ! findmnt "${ROOT_SELINUX}${mp}" >/dev/null \
+              && findmnt --fstab --output TARGET --tab-file "${ROOT_SELINUX}/etc/fstab" "$mp" >/dev/null; then
+                chroot "$ROOT_SELINUX" mount "$mp" || ret=1
+            fi
+        done
+    fi
+    if [ $ret -eq 0 ]; then
         info "SELinux: mount root read-write and relabel"
         mount -o remount,rw "${ROOT_SELINUX}"
-        oldrovalue="$(btrfs prop get "${ROOT_SELINUX}" ro | cut -d= -f2)"
-        btrfs prop set "${ROOT_SELINUX}" ro false
+        if [ -n "$root_is_btrfs" ]; then
+            oldrovalue="$(btrfs prop get "${ROOT_SELINUX}" ro | cut -d= -f2)"
+            btrfs prop set "${ROOT_SELINUX}" ro false
+        fi
         FORCE=
         [ -e "${ROOT_SELINUX}"/etc/selinux/.autorelabel ] && FORCE="$(cat "${ROOT_SELINUX}"/etc/selinux/.autorelabel)"
         . "${ROOT_SELINUX}"/etc/selinux/config
         # Marker when we had relabelled the filesystem. This is relabelled as well.
         > "${ROOT_SELINUX}"/etc/selinux/.relabelled
-        LANG=C chroot "$ROOT_SELINUX" /sbin/setfiles $FORCE -T 0 -e /var/lib/overlay -e /proc -e /sys -e /dev -e /etc "/etc/selinux/${SELINUXTYPE}/contexts/files/file_contexts" $(chroot "$ROOT_SELINUX" cut -d" " -f2 /proc/mounts)
-        # On overlayfs, st_dev isn't consistent so setfiles thinks it's a different mountpoint, ignoring it.
-        # st_dev changes also on copy-up triggered by setfiles itself, so the only way to relabel properly
-        # is to list every file explicitly.
-        # That's not all: There's a kernel bug that security.selinux of parent directories is lost on copy-up (bsc#1210690).
-        # Work around that by visiting children first and only then the parent directories.
-        LANG=C chroot "$ROOT_SELINUX" find /etc -depth -exec /sbin/setfiles $FORCE "/etc/selinux/${SELINUXTYPE}/contexts/files/file_contexts" \{\} +
-        btrfs prop set "${ROOT_SELINUX}" ro "${oldrovalue}"
+        if [ -n "$etc_is_overlay" ]; then
+            LANG=C chroot "$ROOT_SELINUX" /sbin/setfiles $FORCE -T 0 -e /var/lib/overlay -e /proc -e /sys -e /dev -e /etc "/etc/selinux/${SELINUXTYPE}/contexts/files/file_contexts" $(chroot "$ROOT_SELINUX" cut -d" " -f2 /proc/mounts)
+            # On overlayfs, st_dev isn't consistent so setfiles thinks it's a different mountpoint, ignoring it.
+            # st_dev changes also on copy-up triggered by setfiles itself, so the only way to relabel properly
+            # is to list every file explicitly.
+            # That's not all: There's a kernel bug that security.selinux of parent directories is lost on copy-up (bsc#1210690).
+            # Work around that by visiting children first and only then the parent directories.
+            LANG=C chroot "$ROOT_SELINUX" find /etc -depth -exec /sbin/setfiles $FORCE "/etc/selinux/${SELINUXTYPE}/contexts/files/file_contexts" \{\} +
+        else
+            LANG=C chroot "$ROOT_SELINUX" /sbin/setfiles $FORCE -T 0 -e /proc -e /sys -e /dev "/etc/selinux/${SELINUXTYPE}/contexts/files/file_contexts" $(chroot "$ROOT_SELINUX" cut -d" " -f2 /proc/mounts)
+        fi
+        if [ -n "$root_is_btrfs" ]; then
+            btrfs prop set "${ROOT_SELINUX}" ro "${oldrovalue}"
+        fi
     fi
 
     umount -R "${ROOT_SELINUX}"
@@ -79,8 +105,9 @@ rd_microos_relabel()
     return $ret
 }
 
-if test -e "$NEWROOT"/.autorelabel -a "$NEWROOT"/.autorelabel -nt "$NEWROOT"/etc/selinux/.relabelled ; then
-    cp -a "$NEWROOT"/.autorelabel "$NEWROOT"/etc/selinux/.autorelabel
+if [ -e "$NEWROOT"/.autorelabel ] && [ "$NEWROOT"/.autorelabel -nt "$NEWROOT"/etc/selinux/.relabelled ]; then
+    mount -o remount,rw "$NEWROOT" || return 1
+    cp -a "$NEWROOT"/.autorelabel "$NEWROOT"/etc/selinux/.autorelabel || return 1
     rm -f "$NEWROOT"/.autorelabel 2>/dev/null
 fi
 
