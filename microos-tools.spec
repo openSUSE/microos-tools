@@ -32,6 +32,7 @@ BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(dracut)
 BuildRequires:  pkgconfig(rpm)
 BuildRequires:  pkgconfig(systemd)
+Requires:       /usr/bin/findmnt
 Requires:       read-only-root-fs
 # for man-online
 Requires:       mandoc-bin
