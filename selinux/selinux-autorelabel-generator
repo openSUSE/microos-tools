@@ -1,5 +1,5 @@
-#!/bin/sh
-set -e
+#!/bin/bash
+set -euo pipefail
 
 # This systemd.generator(7) detects if SELinux is running and if the
 # user requested an autorelabel. If so, services will be enabled to
@@ -8,7 +8,7 @@ set -e
 
 # If invoked with no arguments (for testing) write to /tmp.
 generatordir="/tmp"
-if [ -n "$1" ]; then
+if [ -n "${1-}" ]; then
 	generatordir="$1"
 fi
 
@@ -17,13 +17,15 @@ enable_units() {
 
 	relabel_unit_list=""
 
-	for realdir in "/.snapshots" "/home" "/opt" "/root" "/srv" "/usr/local" \
-	    "/boot/grub2/i386-pc" "/boot/grub2/x86_64-efi" \
-	    "/boot/grub2/arm64-efi" "/boot/writable"; do
-		# Make sure the directory exist, else we create
-		# services for non existing mount points
-		test -d "${realdir}" || continue
-		mountunit=$(systemd-escape --path ${realdir})
+	while read -r realdir; do
+		# Skip non-fs (swap) mounts, /, /var, /etc (already done in the initrd) and mountpoints with noauto
+		if [ "${realdir:0:1}" != "/" ] \
+		   || [ "${realdir}" = "/" ] || [ "${realdir}" = "/var" ] || [ "${realdir}" = "/etc" ] \
+		   || findmnt --fstab --noheadings --output OPTIONS --target "${realdir}" | grep -qw noauto; then
+			continue
+		fi
+
+		mountunit=$(systemd-escape --path "${realdir}")
 		unitfile="${mountunit}-relabel.service"
 		relabel_unit_list="$unitfile $relabel_unit_list"
 
@@ -44,7 +46,7 @@ enable_units() {
 		EOF
 
 		ln -sf ../"${unitfile}" "${generatordir}"/local-fs.target.requires/"${unitfile}"
-	done
+	done < <(findmnt --fstab --noheadings --output TARGET)
 
 	unitfile="mark-autorelabel-done.service"
 	cat >"${generatordir}/${unitfile}" <<-EOF
