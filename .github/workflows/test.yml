@@ -1,0 +1,25 @@
+name: MicroOS in QEMU
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: opensuse/tumbleweed
+      options: --privileged
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install dependencies
+      run: |
+        zypper in -y autoconf automake e2fsprogs gcc make dracut qemu-img qemu-x86 rpm-devel wget
+    - name: Build
+      run: |
+        ./autogen.sh
+        ./configure --sysconfdir=/etc
+        make -j$(nproc)
+    - name: Test
+      run: |
+        bash test/test.sh
