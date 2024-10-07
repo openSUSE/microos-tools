@@ -112,17 +112,18 @@ if [ -e "$NEWROOT"/.autorelabel ] && [ "$NEWROOT"/.autorelabel -nt "$NEWROOT"/et
 fi
 
 if rd_is_selinux_enabled; then
-    if test -f "$NEWROOT"/etc/selinux/.autorelabel; then
-        rd_microos_relabel
-    elif getarg "autorelabel" > /dev/null; then
-        rd_microos_relabel
+    if [ -f "$NEWROOT"/etc/selinux/.autorelabel ] || getarg "autorelabel" > /dev/null; then
+        if ! rd_microos_relabel; then
+            warn "SELinux autorelabelling failed!"
+            return 1
+        fi
     fi
 elif test -e "$NEWROOT"/etc/selinux/.relabelled; then
     # SELinux is off but looks like some labeling took place before.
     # So probably a boot with manually disabled SELinux. Make sure
     # the system gets relabelled next time SELinux is on.
     > "$NEWROOT"/etc/selinux/.autorelabel
-    warn "SElinux is off in labelled system!"
+    warn "SELinux is off in labelled system!"
 fi
 
 return 0
