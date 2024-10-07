@@ -1,3 +1,22 @@
+Version 4.0:
+- Some refactoring of the SELinux relabelling code
+- The SELinux relabelling code is now usable on non-transactional systems as well
+- Split SELinux relabelling code into separate package
+- Add automated testing of SELinux relabelling functionality
+- Use multiple threads for SELinux relabelling
+- Don't relabel in the zipl initrd "initgrub" mode
+- 98selinux-microos: Avoid "/sysroot-selinux: not mounted" on new util-linux
+- Install man-online alias only for bash
+- Add man-online command
+- Drop support for sle15 builds
+- Add OBS CI workflow
+- 98selinux-microos: Set mount propagation properly
+- 98selinux-microos: Convert tabs to spaces
+- 98selinux-microos: Don't include setenforce unnecessarily
+- Add spec file
+- systemd-proxy-env: fix typos in setup-systemd-proxy-env
+- Bump version to 4.0 to have a higher version than the previous selinux-autorelabel
+
 Version 2.21:
 - 98selinux-microos: Work around overlayfs bug [bsc#1210690]
 - 98selinux-microos: Create .relabelled marker before relabelling
