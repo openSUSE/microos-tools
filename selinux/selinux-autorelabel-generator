@@ -41,6 +41,7 @@ enable_units() {
 			[Service]
 			Type=oneshot
 			ExecStart=/sbin/restorecon -R ${opts} ${realdir}
+			RemainAfterExit=true
 		EOF
 
 		ln -sf ../"${unitfile}" "${generatordir}"/local-fs.target.requires/"${unitfile}"
@@ -60,7 +61,8 @@ enable_units() {
 		[Service]
 		Type=oneshot
 		ExecStart=/usr/bin/rm /etc/selinux/.autorelabel
-EOF
+		RemainAfterExit=true
+	EOF
 
 	ln -sf "../${unitfile}" "${generatordir}/local-fs.target.requires/${unitfile}"
 }
