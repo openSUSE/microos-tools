@@ -36,6 +36,8 @@ enable_units() {
 			[Unit]
 			Description=Relabel ${realdir}
 			DefaultDependencies=no
+			Requires=systemd-tmpfiles-setup-sys.service
+			After=systemd-tmpfiles-setup-sys.service
 			RequiresMountsFor=${realdir}
 			Before=local-fs.target
 			ConditionSecurity=selinux
