@@ -1,4 +1,4 @@
-#
+##
 # spec file for package microos-tools
 #
 # Copyright (c) 2023 SUSE LLC
@@ -57,18 +57,18 @@ This package contains tools to make developing of MicroOS easier.
 %make_install
 
 %pre
-%service_add_pre setup-systemd-proxy-env.service setup-systemd-proxy-env.path printenv.service
+%service_add_pre setup-systemd-proxy-env.service setup-systemd-proxy-env.path printenv.service systemd-tmpfiles-setup-sys.service
 
 %post
 %{regenerate_initrd_post}
-%service_add_post setup-systemd-proxy-env.service setup-systemd-proxy-env.path printenv.service
+%service_add_post setup-systemd-proxy-env.service setup-systemd-proxy-env.path printenv.service systemd-tmpfiles-setup-sys.service
 
 %preun
-%service_del_preun setup-systemd-proxy-env.service setup-systemd-proxy-env.path printenv.service
+%service_del_preun setup-systemd-proxy-env.service setup-systemd-proxy-env.path printenv.service systemd-tmpfiles-setup-sys.service
 
 %postun
 %{regenerate_initrd_post}
-%service_del_postun setup-systemd-proxy-env.service setup-systemd-proxy-env.path printenv.service
+%service_del_postun setup-systemd-proxy-env.service setup-systemd-proxy-env.path printenv.service systemd-tmpfiles-setup-sys.service
 
 %posttrans
 %{regenerate_initrd_posttrans}
@@ -92,6 +92,7 @@ This package contains tools to make developing of MicroOS easier.
 %{_unitdir}/printenv.service
 %{_unitdir}/setup-systemd-proxy-env.path
 %{_unitdir}/setup-systemd-proxy-env.service
+%{_unitdir}/systemd-tmpfiles-setup-sys.service
 %dir %{_unitdir}/salt-minion.service.d
 %{_unitdir}/salt-minion.service.d/TMPDIR.conf
 %{_tmpfilesdir}/salt-minion-tmpdir.conf

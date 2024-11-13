@@ -1,0 +1,29 @@
+# Workaround for bsc#1232709
+# 
+# SELinux labels need to be set for certain /sys entries
+# before restorecon -T0 can be run by the selinux-autorelabel
+# generated unit files.
+# 
+# The /sys entries that need to be labeled in advance are defined in:
+# /usr/lib/tmpfiles.d/selinux-policy.conf
+#
+# This can be removed in case systemd upstream adds /sys
+# to their mount_setup: 
+# https://github.com/systemd/systemd/blob/bdf75118bade008b6a465173c02933eb377aef0d/src/shared/mount-setup.c#L407
+
+[Unit]
+Description=Set correct SELinux labels in /sys
+Documentation=man:tmpfiles.d(5) man:systemd-tmpfiles(8)
+
+DefaultDependencies=no
+Before=sysinit.target local-fs-pre.target systemd-udevd.service
+Wants=local-fs-pre.target
+Conflicts=shutdown.target initrd-switch-root.target
+Before=shutdown.target initrd-switch-root.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=systemd-tmpfiles --prefix=/sys --create --boot
+SuccessExitStatus=DATAERR CANTCREAT
+ImportCredential=tmpfiles.*
