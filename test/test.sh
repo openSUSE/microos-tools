@@ -57,8 +57,6 @@ if ! [ -n "${reuseinitrd}" ] || ! [ -e "${tmpdir}/vmlinuz" ] || ! [ -e "${tmpdir
 	rm -f "${tmpdir}/done"
 	cat >create-initrd <<'EOF'
 #!/bin/bash
-# Workaround for https://bugzilla.opensuse.org/show_bug.cgi?id=1230912
-# combustion: network
 set -euxo pipefail
 exec &>/dev/ttyS0
 trap '[ $? -eq 0 ] || poweroff -f' EXIT
