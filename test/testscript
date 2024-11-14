@@ -1,6 +1,4 @@
 #!/bin/bash
-# Work around for https://bugzilla.opensuse.org/show_bug.cgi?id=1230912
-# combustion: network
 set -euxo pipefail
 exec &>/dev/ttyS0
 # Poweroff immediately on any failure to avoid unnecessary waiting.
