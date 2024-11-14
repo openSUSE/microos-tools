@@ -23,6 +23,12 @@ if restorecon -nvR -e /.snapshots -e /run / | grep -v wtmpdb | grep "Would relab
 	echo "Some labels aren't correct?"
 	exit 1
 fi
+# Check that there are no SELinux denials.
+# Can't use ausearch here, that would miss initial boot events.
+if journalctl -b | grep -w avc | grep -w denied; then
+	echo "SELinux denials found"
+	exit 1
+fi
 mount -t 9p -o trans=virtio tmpdir /mnt
 touch /mnt/done
 umount /mnt
