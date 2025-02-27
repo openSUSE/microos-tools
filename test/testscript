@@ -37,6 +37,9 @@ EOF
 chmod a+x /usr/bin/combustion-validate
 
 cat >>/etc/systemd/system/combustion-validate.service <<'EOF'
+[Unit]
+# This creates files in /etc/ssh/, make sure it's done.
+After=sshd.service
 [Service]
 Type=oneshot
 StandardOutput=journal+console
