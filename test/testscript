@@ -19,7 +19,7 @@ cat >>/usr/bin/combustion-validate <<'EOF'
 set -euxo pipefail
 trap '[ $? -eq 0 ] || poweroff -f' EXIT
 # Print a list of files which have SELinux label mismatches
-if restorecon -nvR -e /.snapshots -e /run / | grep -v wtmpdb | grep "Would relabel"; then
+if restorecon -nvR -e /.snapshots -e /run / | grep "Would relabel"; then
 	echo "Some labels aren't correct?"
 	exit 1
 fi
