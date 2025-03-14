@@ -1,3 +1,6 @@
+Version X.Y:
+- systemd-proxy-env got moved to aaa_base
+
 Version 4.0:
 - Some refactoring of the SELinux relabelling code
 - The SELinux relabelling code is now usable on non-transactional systems as well

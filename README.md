@@ -27,11 +27,6 @@ they exist on this system. If not, locale is reset to the system default.
 
 ## systemd services
 
-### setup-systemd-proxy-env.service
-
-The `setup-systemd-proxy-env.service` makes the proxy variables from
-`/etc/sysconfig/proxy` available to all systemd units.
-
 ### printenv.service
 
 The `printenv.service` is to debug which environment variables exist
