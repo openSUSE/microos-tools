@@ -45,7 +45,7 @@ done
 tmpdir=$(mktemp -d -t addimageencryption.XXXXXX)
 trap cleanup EXIT
 
-if [ -z "$section" ] && [ "${1/#[0-9]/}" != "$1" ]; then
+if [ -z "$section" ] && [ "${1/.#[0-9]/}" != "$1" ]; then
     section="$1"
     shift
 fi
