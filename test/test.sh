@@ -94,3 +94,53 @@ if ! [ -e "${tmpdir}/done" ]; then
 	echo "Test failed"
 	exit 1
 fi
+
+# Now do some testing with Minimal-VM instead of MicroOS
+
+# Download latest Minimal-VM image
+if ! [ -f openSUSE-Tumbleweed-Minimal-VM.x86_64-kvm-and-xen.qcow2 ]; then
+        wget --progress=bar:force:noscroll https://download.opensuse.org/tumbleweed/appliances/openSUSE-Tumbleweed-Minimal-VM.x86_64-kvm-and-xen.qcow2
+        qemu-img snapshot -c initial openSUSE-Tumbleweed-Minimal-VM.x86_64-kvm-and-xen.qcow2
+else
+        qemu-img snapshot -a initial openSUSE-Tumbleweed-Minimal-VM.x86_64-kvm-and-xen.qcow2
+fi
+
+# Use combustion in the downloaded image to generate an initrd with the new 98selinux-microos.
+if ! [ -n "${reuseinitrd}" ] || ! [ -e "${tmpdir}/vmlinuz-minimal" ] || ! [ -e "${tmpdir}/initrd-minimal" ]; then
+	rm -f "${tmpdir}/done"
+	cat >create-initrd <<'EOF'
+#!/bin/bash
+set -euxo pipefail
+exec &>/dev/ttyS0
+trap '[ $? -eq 0 ] || SYSTEMD_IGNORE_CHROOT=1 poweroff -f' EXIT
+mount -t 9p -o trans=virtio tmpdir /mnt
+cp -av /mnt/install/usr /
+cp /usr/lib/modules/$(uname -r)/vmlinuz /mnt/vmlinuz-minimal
+dracut -f --no-hostonly /mnt/initrd-minimal
+touch /mnt/done
+umount /mnt
+SYSTEMD_IGNORE_CHROOT=1 poweroff -f
+EOF
+
+	timeout 300 qemu-system-x86_64 "${QEMU_BASEARGS[@]}" -drive if=virtio,file=openSUSE-Tumbleweed-Minimal-VM.x86_64-kvm-and-xen.qcow2 \
+		-fw_cfg name=opt/org.opensuse.combustion/script,file=create-initrd
+
+	if ! [ -e "${tmpdir}/done" ]; then
+		echo "Initrd generation failed"
+		exit 1
+	fi
+fi
+
+# Test using a config drive
+rm -f "${tmpdir}/done"
+qemu-img snapshot -a initial openSUSE-Tumbleweed-Minimal-VM.x86_64-kvm-and-xen.qcow2
+
+timeout 300 qemu-system-x86_64 "${QEMU_BASEARGS[@]}" -drive if=virtio,file=openSUSE-Tumbleweed-Minimal-VM.x86_64-kvm-and-xen.qcow2 \
+	-kernel vmlinuz-minimal -initrd initrd-minimal -append "root=LABEL=ROOT rw console=ttyS0 security=selinux selinux=1 quiet systemd.show_status=1 systemd.log_target=console systemd.journald.forward_to_console=1 rd.emergency=poweroff rd.shell=0" \
+	-drive if=virtio,file=combustion.raw
+
+if ! [ -e "${tmpdir}/done" ]; then
+	echo "Test failed"
+	exit 1
+fi
+
