@@ -2,7 +2,7 @@
 set -euxo pipefail
 exec &>/dev/ttyS0
 # Poweroff immediately on any failure to avoid unnecessary waiting.
-trap '[ $? -eq 0 ] || poweroff -f' EXIT
+trap '[ $? -eq 0 ] || SYSTEMD_IGNORE_CHROOT=1 poweroff -f' EXIT
 
 # Remove old microos-tools
 rpm -e --nodeps --noscripts --nodb microos-tools
