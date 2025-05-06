@@ -21,7 +21,7 @@ enable_units() {
 		# Skip non-fs (swap) mounts, /, /var, /etc (already done in the initrd) and mountpoints with noauto
 		if [ "${realdir:0:1}" != "/" ] \
 		   || [ "${realdir}" = "/" ] || [ "${realdir}" = "/var" ] || [ "${realdir}" = "/etc" ] \
-		   || ! findmnt --fstab --noheadings --output FSTYPE --target / | grep -qE '^(ext2|ext3|ext4|xfs|btrfs|jfs)$' \
+		   || ! findmnt --fstab --noheadings --output FSTYPE --target "${realdir}" | grep -qE '^(ext2|ext3|ext4|xfs|btrfs|jfs)$' \
 		   || findmnt --fstab --noheadings --output OPTIONS --target "${realdir}" | grep -qwE 'noauto|x-systemd\.automount|_netdev'; then
 			continue
 		fi
