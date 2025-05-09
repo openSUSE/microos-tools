@@ -1,4 +1,5 @@
 Version X.Y:
+- Add import-pubring-from-rpmdb to create /etc/systemd/import-pubring.gpg with keys from rpmdb
 - systemd-proxy-env got moved to aaa_base
 
 Version 4.0:

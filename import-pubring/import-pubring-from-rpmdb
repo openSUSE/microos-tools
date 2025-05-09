@@ -1,0 +1,3 @@
+#!/bin/sh
+
+rpm -q --queryformat "%{DESCRIPTION}\n" $(rpm -q gpg-pubkey) | gpg --import --no-options --no-default-keyring --keyring /etc/systemd/import-pubring.gpg

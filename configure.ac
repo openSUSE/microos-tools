@@ -30,5 +30,6 @@ AC_PROG_LN_S
 
 AC_CONFIG_FILES([Makefile systemd-printenv/Makefile \
 	tmpfs/Makefile selinux/Makefile \
+	import-pubring/Makefile \
 	devel-tools/Makefile])
 AC_OUTPUT

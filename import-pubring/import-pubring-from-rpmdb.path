@@ -1,0 +1,11 @@
+[Unit]
+Description=Watch for changes in rpmdb to update import-pubring.gpg
+After=local-fs.target
+
+[Path]
+Unit=import-pubring-from-rpmdb.service
+PathChanged=/usr/lib/sysimage/rpm/
+
+[Install]
+WantedBy=default.target
+

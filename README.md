@@ -27,6 +27,11 @@ they exist on this system. If not, locale is reset to the system default.
 
 ## systemd services
 
+### import-pubring-from-rpmdb.service
+
+The `import-pubring-from-rpmdb.service` imports the keys from rpmdb int
+`/etc/systemd/import-pubring.gpg`.
+
 ### printenv.service
 
 The `printenv.service` is to debug which environment variables exist

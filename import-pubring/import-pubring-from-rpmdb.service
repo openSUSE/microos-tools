@@ -1,0 +1,11 @@
+[Unit]
+Description=Update import-pubring.gpg with keys from rpmdb
+Wants=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/import-pubring-from-rpmdb
+
+[Install]
+WantedBy=default.target
+
