@@ -67,16 +67,16 @@ This package contains tools to make developing of MicroOS easier.
 %make_install
 
 %pre
-%service_add_pre printenv.service
+%service_add_pre printenv.service import-pubring-from-rpmdb.path import-pubring-from-rpmdb.service
 
 %preun
-%service_del_preun printenv.service
+%service_del_preun printenv.service import-pubring-from-rpmdb.path import-pubring-from-rpmdb.service
 
 %post
-%service_add_post printenv.service
+%service_add_post printenv.service import-pubring-from-rpmdb.path import-pubring-from-rpmdb.service
 
 %postun
-%service_del_postun printenv.service
+%service_del_postun printenv.service import-pubring-from-rpmdb.path import-pubring-from-rpmdb.service
 
 %pre -n microos-devel-tools
 %service_add_pre microos-ro.service
@@ -111,12 +111,15 @@ This package contains tools to make developing of MicroOS easier.
 %files
 %dir %{_sysconfdir}/selinux
 %config %{_sysconfdir}/selinux/fixfiles_exclude_dirs
+%{_unitdir}/import-pubring-from-rpmdb.path
+%{_unitdir}/import-pubring-from-rpmdb.service
 %{_unitdir}/printenv.service
 %dir %{_unitdir}/salt-minion.service.d
 %{_unitdir}/salt-minion.service.d/TMPDIR.conf
 %{_tmpfilesdir}/salt-minion-tmpdir.conf
 %dir %{_distconfdir}/tukit.conf.d
 %{_distconfdir}/tukit.conf.d/salt-tukit.conf
+%{_bindir}/import-pubring-from-rpmdb
 %{_bindir}/man-online
 %{_distconfdir}/profile.d/man-online.sh
 
