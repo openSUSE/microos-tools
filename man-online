@@ -21,11 +21,12 @@ cleanup()
 show()
 {
     local topic="${1:?}"
-    if ! curl -s -f -o "$tmpdir/$topic".gz -f -L https://manpages.opensuse.org/"$topic${section:+.}$section".gz; then
+    local name=$(basename $topic)
+    if ! curl -s -f -o "$tmpdir/$name".gz -f -L https://manpages.opensuse.org/"$topic${section:+.}$section".gz; then
 	echo "Failed to fetch $topic" >&2
 	return 0
     fi
-    mandoc -l "$tmpdir/$topic.gz"
+    mandoc -l "$tmpdir/$name.gz"
 }
 
 getopttmp=$(getopt -o hs: --long help -n "${0##*/}" -- "$@")
@@ -42,7 +43,18 @@ done
 
 [ -z "$1" ] && helpandquit
 
-tmpdir=$(mktemp -d -t addimageencryption.XXXXXX)
+test -f /usr/lib/os-release && . /usr/lib/os-release
+test -f /etc/os-release && . /etc/os-release
+
+product=""
+
+case "$NAME" in
+    "SLES")
+	product="Leap-$VERSION_ID/" ;;
+    *) ;;
+esac
+
+tmpdir=$(mktemp -d -t man-online.XXXXXX)
 trap cleanup EXIT
 
 if [ -z "$section" ] && [ "$#" -gt 1 ] && [ "${1/#[0-9]/}" != "$1" ]; then
@@ -51,5 +63,5 @@ if [ -z "$section" ] && [ "$#" -gt 1 ] && [ "${1/#[0-9]/}" != "$1" ]; then
 fi
 
 for i in "$@"; do
-    show "$i"
+    show "$product$i"
 done
