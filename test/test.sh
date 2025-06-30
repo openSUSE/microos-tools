@@ -52,7 +52,7 @@ else
 	qemu-img snapshot -a initial openSUSE-MicroOS.x86_64-kvm-and-xen.qcow2
 fi
 
-# First step: Use combustion in the downloaded image to generate an initrd with the new 98selinux-microos.
+# First step: Use combustion in the downloaded image to generate an initrd with the new 89selinux-relabel.
 if ! [ -n "${reuseinitrd}" ] || ! [ -e "${tmpdir}/vmlinuz" ] || ! [ -e "${tmpdir}/initrd" ]; then
 	rm -f "${tmpdir}/done"
 	cat >create-initrd <<'EOF'
@@ -105,7 +105,7 @@ else
         qemu-img snapshot -a initial openSUSE-Tumbleweed-Minimal-VM.x86_64-kvm-and-xen.qcow2
 fi
 
-# Use combustion in the downloaded image to generate an initrd with the new 98selinux-microos.
+# Use combustion in the downloaded image to generate an initrd with the new 89selinux-relabel.
 if ! [ -n "${reuseinitrd}" ] || ! [ -e "${tmpdir}/vmlinuz-minimal" ] || ! [ -e "${tmpdir}/initrd-minimal" ]; then
 	rm -f "${tmpdir}/done"
 	cat >create-initrd <<'EOF'

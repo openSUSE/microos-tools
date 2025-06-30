@@ -1,6 +1,7 @@
 Version X.Y:
 - Add import-pubring-from-rpmdb to create /etc/systemd/import-pubring.gpg with keys from rpmdb
 - systemd-proxy-env got moved to aaa_base
+- 89selinux-relabel: renamed from 98selinux-microos, to allow encrypted /var partitions
 
 Version 4.0:
 - Some refactoring of the SELinux relabelling code

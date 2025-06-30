@@ -127,7 +127,7 @@ This package contains tools to make developing of MicroOS easier.
 %license COPYING
 %dir %{_prefix}/lib/dracut
 %dir %{_prefix}/lib/dracut/modules.d
-%{_prefix}/lib/dracut/modules.d/98selinux-microos
+%{_prefix}/lib/dracut/modules.d/89selinux-relabel
 %{_systemdgeneratordir}/selinux-autorelabel-generator
 %{_unitdir}/systemd-tmpfiles-setup-sys.service
 

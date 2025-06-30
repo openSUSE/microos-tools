@@ -1,9 +1,9 @@
-modulesdir = @dracutmodulesdir@/98selinux-microos
+modulesdir = @dracutmodulesdir@/89selinux-relabel
 selinuxdir = @sysconfdir@/selinux
 systemddir = $(systemdsystemunitdir)
 
-modules_SCRIPTS = 98selinux-microos/selinux-microos-relabel.sh \
-	98selinux-microos/module-setup.sh
+modules_SCRIPTS = 89selinux-relabel/selinux-microos-relabel.sh \
+	89selinux-relabel/module-setup.sh
 
 selinux_DATA = fixfiles_exclude_dirs
 
