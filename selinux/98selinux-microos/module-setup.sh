@@ -17,6 +17,7 @@ check() {
                 push_host_devs "$_dev"
                 if [[ -z ${host_fs_types["$_dev"]} ]]; then
                     host_fs_types["$_dev"]="$_fstype"
+                    check_block_and_slaves_all _get_fs_type "$(get_maj_min "$_dev")"
                 fi
             fi
         fi
