@@ -122,6 +122,9 @@ This package contains tools to make developing of MicroOS easier.
 %{_bindir}/import-pubring-from-rpmdb
 %{_bindir}/man-online
 %{_distconfdir}/profile.d/man-online.sh
+%{_distconfdir}/profile.d/zypp-single-rpmtrans.sh
+%dir %{_systemd_util_dir}/system.conf.d
+%{_systemd_util_dir}/system.conf.d/10-zypp-single-rpmtrans.conf
 
 %files -n selinux-autorelabel
 %license COPYING
