@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = 1.6 foreign check-news dist-xz
 
-SUBDIRS = systemd-printenv tmpfs selinux devel-tools import-pubring
+SUBDIRS = systemd-printenv tmpfs selinux devel-tools import-pubring zypp-single-rpmtrans
 
 CLEANFILES = *~
 

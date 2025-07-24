@@ -6,6 +6,8 @@ AC_PREFIX_DEFAULT(/usr)
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 
+PKG_CHECK_VAR([systemdutildir], [systemd], [systemdutildir], [],
+        [AC_MSG_ERROR([Could not determine value for 'systemdutildir' - is the 'systemd.pc' file installed?])])
 PKG_CHECK_VAR([systemdsystemunitdir], [systemd], [systemdsystemunitdir], [],
 	[AC_MSG_ERROR([Could not determine value for 'systemdsystemunitdir' - is the 'systemd.pc' file installed?])])
 PKG_CHECK_VAR([tmpfilesdir], [systemd], [tmpfilesdir], [],
@@ -31,5 +33,6 @@ AC_PROG_LN_S
 AC_CONFIG_FILES([Makefile systemd-printenv/Makefile \
 	tmpfs/Makefile selinux/Makefile \
 	import-pubring/Makefile \
+	zypp-single-rpmtrans/Makefile \
 	devel-tools/Makefile])
 AC_OUTPUT
