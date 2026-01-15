@@ -55,6 +55,18 @@ Summary:        Tools to develop MicroOS
 %description -n microos-devel-tools
 This package contains tools to make developing of MicroOS easier.
 
+%package -n zypp-no-recommends
+Summary:         Disable recommends of libzypp by default
+
+%description -n zypp-no-recommends
+This package installs a zypp.conf snippet to disable Recommends.
+
+%package -n zypp-excludedocs
+Summary:         Exclude installation of docs by libzypp
+
+%description -n zypp-excludedocs
+This package installs a zypp.conf snippet to enable excludedocs.
+
 %prep
 %autosetup -p1
 
@@ -141,5 +153,15 @@ This package contains tools to make developing of MicroOS easier.
 %{_sbindir}/rpm-sortbysize
 %{_sbindir}/rpmorphan
 %{_sbindir}/sysext-add-debug
+
+%files -n zypp-no-recommends
+%dir %{_prefix}/etc/zypp
+%dir %{_prefix}/etc/zypp/zypp.conf.d
+%{_prefix}/etc/zypp/zypp.conf.d/no-recommends.conf
+
+%files -n zypp-excludedocs
+%dir %{_prefix}/etc/zypp
+%dir %{_prefix}/etc/zypp/zypp.conf.d
+%{_prefix}/etc/zypp/zypp.conf.d/excludedocs.conf
 
 %changelog
