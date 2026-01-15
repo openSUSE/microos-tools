@@ -34,5 +34,6 @@ AC_CONFIG_FILES([Makefile systemd-printenv/Makefile \
 	tmpfs/Makefile selinux/Makefile \
 	import-pubring/Makefile \
 	zypp-single-rpmtrans/Makefile \
+	zypp-configs/Makefile \
 	devel-tools/Makefile])
 AC_OUTPUT
