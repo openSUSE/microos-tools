@@ -67,6 +67,15 @@ Summary:         Exclude installation of docs by libzypp
 %description -n zypp-excludedocs
 This package installs a zypp.conf snippet to enable excludedocs.
 
+%package -n zypp-no-multiversion
+Summary:         Don't install multiple packages in parallel
+
+%description -n zypp-no-multiversion
+This package installs a zypp.conf snippet to disable multiversion
+settings. This is normally used to install the kernel in different
+versions at the same time, but not necessary with snapshots or
+transactional-update.
+
 %prep
 %autosetup -p1
 
@@ -163,5 +172,10 @@ This package installs a zypp.conf snippet to enable excludedocs.
 %dir %{_prefix}/etc/zypp
 %dir %{_prefix}/etc/zypp/zypp.conf.d
 %{_prefix}/etc/zypp/zypp.conf.d/excludedocs.conf
+
+%files -n zypp-no-multiversion
+%dir %{_prefix}/etc/zypp
+%dir %{_prefix}/etc/zypp/zypp.conf.d
+%{_prefix}/etc/zypp/zypp.conf.d/no-multiversion.conf
 
 %changelog
