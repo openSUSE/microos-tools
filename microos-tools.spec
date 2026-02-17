@@ -57,18 +57,21 @@ This package contains tools to make developing of MicroOS easier.
 
 %package -n zypp-no-recommends
 Summary:         Disable recommends of libzypp by default
+Requires:        libzypp(econf)
 
 %description -n zypp-no-recommends
 This package installs a zypp.conf snippet to disable Recommends.
 
 %package -n zypp-excludedocs
 Summary:         Exclude installation of docs by libzypp
+Requires:        libzypp(econf)
 
 %description -n zypp-excludedocs
 This package installs a zypp.conf snippet to enable excludedocs.
 
 %package -n zypp-no-multiversion
 Summary:         Don't install multiple packages in parallel
+Requires:        libzypp(econf)
 
 %description -n zypp-no-multiversion
 This package installs a zypp.conf snippet to disable multiversion
