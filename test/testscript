@@ -9,10 +9,11 @@ if rpm -q microos-tools >/dev/null; then
 	rpm -e --nodeps --noscripts --nodb microos-tools
 fi
 rpm -e --nodeps --noscripts --nodb selinux-autorelabel
+modprobe 9pnet_virtio # Explicitly load the module from the real root
+mount -t 9p -o trans=virtio tmpdir /mnt
 # Install microos-tools
 # FIXME: This installs all of microos-tools on Minimal as well,
 # which is wrong but doesn't break anything ATM.
-mount -t 9p -o trans=virtio tmpdir /mnt
 chown -R root:root /mnt/install/usr
 cp -av /mnt/install/usr /
 umount /mnt

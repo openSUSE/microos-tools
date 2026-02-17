@@ -60,6 +60,7 @@ if ! [ -n "${reuseinitrd}" ] || ! [ -e "${tmpdir}/vmlinuz" ] || ! [ -e "${tmpdir
 set -euxo pipefail
 exec &>/dev/ttyS0
 trap '[ $? -eq 0 ] || SYSTEMD_IGNORE_CHROOT=1 poweroff -f' EXIT
+modprobe 9pnet_virtio # Explicitly load the module from the real root
 mount -t 9p -o trans=virtio tmpdir /mnt
 cp -av /mnt/install/usr /
 cp /usr/lib/modules/$(uname -r)/vmlinuz /mnt/vmlinuz
@@ -113,6 +114,7 @@ if ! [ -n "${reuseinitrd}" ] || ! [ -e "${tmpdir}/vmlinuz-minimal" ] || ! [ -e "
 set -euxo pipefail
 exec &>/dev/ttyS0
 trap '[ $? -eq 0 ] || SYSTEMD_IGNORE_CHROOT=1 poweroff -f' EXIT
+modprobe 9pnet_virtio # Explicitly load the module from the real root
 mount -t 9p -o trans=virtio tmpdir /mnt
 cp -av /mnt/install/usr /
 cp /usr/lib/modules/$(uname -r)/vmlinuz /mnt/vmlinuz-minimal
