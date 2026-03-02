@@ -73,6 +73,10 @@ rd_microos_relabel()
             oldrovalue="$(btrfs prop get "${ROOT_SELINUX}" ro | cut -d= -f2)"
             btrfs prop set "${ROOT_SELINUX}" ro false
         fi
+        if [ -e "${ROOT_SELINUX}"/.autorelabel ]; then
+            cp -a "${ROOT_SELINUX}"/.autorelabel "${ROOT_SELINUX}"/etc/selinux/.autorelabel
+            rm -f "${ROOT_SELINUX}"/.autorelabel 2>/dev/null
+        fi
         FORCE=
         [ -e "${ROOT_SELINUX}"/etc/selinux/.autorelabel ] && FORCE="$(cat "${ROOT_SELINUX}"/etc/selinux/.autorelabel)"
         . "${ROOT_SELINUX}"/etc/selinux/config
@@ -105,14 +109,10 @@ rd_microos_relabel()
     return $ret
 }
 
-if [ -e "$NEWROOT"/.autorelabel ] && [ "$NEWROOT"/.autorelabel -nt "$NEWROOT"/etc/selinux/.relabelled ]; then
-    mount -o remount,rw "$NEWROOT" || return 1
-    cp -a "$NEWROOT"/.autorelabel "$NEWROOT"/etc/selinux/.autorelabel || return 1
-    rm -f "$NEWROOT"/.autorelabel 2>/dev/null
-fi
-
 if rd_is_selinux_enabled; then
-    if [ -f "$NEWROOT"/etc/selinux/.autorelabel ] || getarg "autorelabel" > /dev/null; then
+    if [ -f "$NEWROOT"/etc/selinux/.autorelabel ] ||
+            ( [ -f "$NEWROOT"/.autorelabel ] && [ "$NEWROOT"/.autorelabel -nt "$NEWROOT"/etc/selinux/.relabelled ] ) ||
+            getarg "autorelabel" > /dev/null; then
         if ! rd_microos_relabel; then
             warn "SELinux autorelabelling failed!"
             return 1
