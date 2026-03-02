@@ -60,6 +60,12 @@ enable_units() {
 		Before=local-fs.target
 		After=${relabel_unit_list}
 		Requires=${relabel_unit_list}
+
+		# Make sure /etc is writable
+		After=systemd-remount-fs.service
+		Requires=systemd-remount-fs.service
+		RequiresMountsFor=/etc
+
 		ConditionSecurity=selinux
 		ConditionPathExists=/etc/selinux/.autorelabel
 
