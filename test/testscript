@@ -35,6 +35,10 @@ if journalctl -b | grep -w avc | grep -w denied; then
 	echo "SELinux denials found"
 	exit 1
 fi
+if [ -e /.autorelabel ] || [ -e /etc/selinux/.autorelabel ]; then
+        echo "autorelabel file still exists even though this is a reboot"
+        exit 1
+fi
 mount -t 9p -o trans=virtio tmpdir /mnt
 touch /mnt/done
 umount /mnt
