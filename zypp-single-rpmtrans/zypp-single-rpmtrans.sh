@@ -1,1 +1,0 @@
-export ZYPP_SINGLE_RPMTRANS=1
