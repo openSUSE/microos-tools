@@ -1,0 +1,53 @@
+#!/bin/bash
+set -e
+pkg="${1:?}"
+name="$pkg"
+dst="/var/lib/portables/$name"
+url="http://download.opensuse.org/tumbleweed/repo/oss/"
+
+if [ -e "$dst" ]; then
+    echo "$dst exists, exit." >&2
+    exit 1
+fi
+mkdir -p "$dst/.packages"
+cd "$dst"
+
+cat > ".packages.t" <<EOF
+system x86_64 rpm
+repo repo 50 solv /var/cache/zypp/solv/repo-oss/solv
+job favor name openSUSE-release
+job install name openSUSE-release
+job favor name openSUSE-release-appliance-custom
+job favor name dbus-broker
+job favor name systemd-presets-branding-openSUSE
+solverflags ignorerecommended
+
+job install name $pkg
+EOF
+
+testsolv ".packages.t" > ".result"
+if grep -q "Found.*problems" ".result"; then
+	exit 1
+fi
+
+extract() {
+  rpm2cpio "$1" | cpio --quiet -id
+  find . -type d -not -perm '/0200' -print0 | xargs -0 --no-run-if-empty chmod u+w
+}
+cd "$dst/.packages"
+#extract /.build.binaries/filesystem.rpm
+while read -r dash nevra; do
+    [ "$dash" = '-' ] || continue
+    [ "${nevra##*:}" = "$nevra" ] || continue
+    arch="${nevra##*.}"
+    #[ -e "$nevra.rpm" ] || download "$nevra.rpm" "$url/$arch/$nevra.rpm"
+    [ -e "$nevra.rpm" ] || echo "$url/$arch/$nevra.rpm"
+done < "$dst/.result" | aria2c --show-console-readout false -i -
+cd "$dst"
+for pkg in .packages/filesystem-*.rpm; do
+    extract "$pkg"
+done
+for pkg in .packages/*.rpm; do
+    extract "$pkg"
+done
+
