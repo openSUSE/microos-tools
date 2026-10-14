@@ -73,6 +73,9 @@ rd_microos_relabel()
             oldrovalue="$(btrfs prop get "${ROOT_SELINUX}" ro | cut -d= -f2)"
             btrfs prop set "${ROOT_SELINUX}" ro false
         fi
+        if ! [ -w "${ROOT_SELINUX}/etc" ]; then
+            mount -o remount,rw "${ROOT_SELINUX}/etc"
+        fi
         if [ -e "${ROOT_SELINUX}"/.autorelabel ]; then
             cp -a "${ROOT_SELINUX}"/.autorelabel "${ROOT_SELINUX}"/etc/selinux/.autorelabel
             rm -f "${ROOT_SELINUX}"/.autorelabel 2>/dev/null
