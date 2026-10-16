@@ -6,6 +6,15 @@ Wants=local-fs.target
 Type=oneshot
 ExecStart=/usr/bin/import-pubring-from-rpmdb
 
+# Hardening: only /etc/systemd needs to be writable, everything else
+# (rpmdb read, gpg scratch homedir under a private /tmp) is read-only
+# or self-contained.
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+NoNewPrivileges=yes
+ReadWritePaths=/etc/systemd
+
 [Install]
 WantedBy=default.target
 
