@@ -1,7 +1,9 @@
 #!/bin/sh
 
+set -eu
+
 GNUPGHOME="$(mktemp -d)"
 export GNUPGHOME
 trap 'gpgconf --kill gpg-agent; rm -rf "$GNUPGHOME"' EXIT
 
-rpm -q --queryformat "%{DESCRIPTION}\n" $(rpm -q gpg-pubkey) | gpg --import --no-options --no-default-keyring --keyring /etc/systemd/import-pubring.gpg
+rpm -q --queryformat "%{DESCRIPTION}\n" gpg-pubkey | gpg --import --batch --yes --no-options --no-default-keyring --keyring /etc/systemd/import-pubring.gpg
